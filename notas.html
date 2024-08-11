@@ -1,0 +1,901 @@
+<!-- 
+LEARN NODE WITH REAL-WORLD APPLICATIONS WITH NODE JS, EXPRESSS, MONGO DB
+    JOHN SMILGA / CODING ADDICT
+        TEACHING STYLE
+            1)general idea
+            2)no slideville
+            3)practical implementation to deepen understanding
+
+WHAT IS NODE JS
+    Environment to run javascript out of the browser
+    Created in 2009
+    Built on Chromes V8 js engine
+    Read, delete, update files
+    Easily communicate with a database
+
+REQUIREMENTS
+    HTML,CSS,Js,ES6
+    Callbacks, Promises, Async-Await
+
+STRUCTURE
+    1)familiarity with nodejs
+    2)installing nodejs
+    3)nodejs fundamentals 
+    4)express js 
+    5)after fundamentals, build node js apps
+
+SECTION 2: INSTALLING NODE --------------------------------------------------------
+
+DIFFERENCES WITH NODEJS VS BROWSER JS
+    1)NO access to browser APIs b/c they DON'T EXIST
+        a)no DOM
+        b)no Window API
+        c)no Geolocation API
+    2)Node builds Server Side Apps(Your logic)
+    3)Access filesystem
+        a)Info of operating system
+        b)respond to network requests
+    4)Based on versions
+        This means that we no longer hold responsibility over uses browser version, they have to stick with our built node app v.
+    6)Access to modules by default COMMON JS
+    
+SECTION 3: NODE BASICS -------------------------------------------------------------
+HOW DOES NODE EVALUATE OUR CODE
+    1)REPL
+        Read, Evaluate, Print Loop
+        Playing around
+    2)CLI
+        Running our app code in node
+        Everything else
+
+RUNNING JS FILE IN CLI 
+    1)move to the path where the file is located cd "pathToFile"
+    2)node fileName.js
+
+VS CODE TERMINAL VS COMPUTER TERMINAL
+    Vs code terminal is directly pointing to the project directory.
+    No need to dance around the differents paths to get to the project and its files.
+
+FINDING SOURCE CODE
+    https://github.com/john-smilga/node-express-course
+
+GLOBAL VARIABLES 
+    Variables that anywhere in the application we can access. 
+
+    1)__dirname 
+        path to current directory
+    2)__filename
+        file name
+    3)require
+        function to use modules(common js)
+    4)module
+        info about current module(file)
+    5)process
+        info about env where the program is being executed
+
+GENERAL MODULE SYNTAX
+    The idea behind modules is to execute 1 file, but to split code between several files. 
+
+    NODEjs MODULE SYSTEM
+        Node uses COMMON js module system by default where every file is a module
+
+    BENEFITS
+        1)encapsulated code
+            Only sharing minimum that we want 
+
+    MODULE GLOBAL VARIABLE IN NODE
+        Literally a big object that has all the info of the current module with a lot of properties:
+        
+        EXAMPLE
+            {
+                id: '.',
+                path: 'C:\\Users\\enzoa\\OneDrive\\Desktop\\Node-JohnSmilga',
+                exports: {},
+                filename: 'C:\\Users\\enzoa\\OneDrive\\Desktop\\Node-JohnSmilga\\4-names.js',
+                loaded: false,
+                children: [],
+                paths: [
+                    'C:\\Users\\enzoa\\OneDrive\\Desktop\\Node-JohnSmilga\\node_modules',
+                    'C:\\Users\\enzoa\\OneDrive\\Desktop\\node_modules',
+                    'C:\\Users\\enzoa\\OneDrive\\node_modules',
+                    'C:\\Users\\enzoa\\node_modules',
+                    'C:\\Users\\node_modules',
+                    'C:\\node_modules'
+                ]
+            }
+            
+    EXPORTING DATA FROM MODULE
+        Access the exports property in the module global variable of that module to share information about it to other modules.
+
+        EXAMPLE
+            module.exports = { variable, function }
+            module.exports = function
+
+    IMPORTING DATA FROM MODULE
+        1)To access the data that was exported from a module, we can import with the global variable require.
+        2)we can name the import whatever we want 
+
+        SYNTAX
+            const variable = require(`./pathToFile`)
+            const shakeAndBake = require)('./pathToFile')
+
+    ALTERNATIVE WAY TO EXPORT 
+        We can really work around the module.exports property and really treat it as an object.
+
+        EXAMPLE
+            module.exports.items = ['item1', 'item2']
+            const person = {
+                name: 'bob',
+
+            }
+            module.exports.singlePerson = person
+
+    MIND GRENADE
+        1)When requiring modules, if there exists a function invoked in that module, that function will run when being required in the other module.
+
+        HOW THIS WORKS
+            Node wraps around the module in a function, and that function runs when being invoked, which means it invokes other functions inside of it. 
+
+BUILT IN MODULES
+    Modules that node already has that can be used without any work.
+        1)OS
+        2)PATH
+        3)FS
+        4)HTTP
+
+    OS MODULE
+        The node:os module provides operating system-related utility methods and properties.
+
+        ACCESSING OS MODULE
+            const os = require('node:os');
+
+        os.userInfo()
+            Returns: <Object>
+
+            Returns information about the currently effective user. On POSIX platforms, this is typically a subset of the password file. The returned object includes the username, uid, gid, shell, and homedir. On Windows, the uid and gid fields are -1, and shell is null.
+
+        os.uptime()
+            Returns: <integer>
+
+            Returns the system uptime in number of seconds.
+
+        os.type()
+            Returns: <string>
+
+            Returns the operating system name as returned by uname(3). For example, it returns 'Linux' on Linux, 'Darwin' on macOS, and 'Windows_NT' on Windows.
+
+        os.totalmem()
+            Returns: <integer>
+
+            Returns the total amount of system memory in bytes as an integer.
+
+        os.freemem()
+            Returns: <string>
+
+            Returns a string identifying the endianness of the CPU for which the Node.js binary was compiled.
+
+    PATH MODULE 
+        The node:path module provides utilities for working with file and directory paths. It can be accessed using:
+
+        ACCESSING OS MODULE
+            const path = require('node:path'); 
+
+        path.sep
+            Returns <string>
+
+            Provides the platform-specific path segment separator:
+                \ on Windows
+                / on POSIX
+
+        path.join([...paths])
+            Returns: <string>
+            
+            The path.join() method joins all given path segments together using the platform-specific separator as a delimiter, then normalizes the resulting path.
+
+        path.basename(path[, suffix])
+            Returns: <string>
+
+            The path.basename() method returns the last portion of a path.
+
+        path.dirname(path)
+            Returns: <string>
+
+            The path.dirname() method returns the directory name of a path, similar to the Unix dirname command.
+
+        WHY IS THIS IMPORTANT
+            Our app will run in different environment, so these paths CAN NOT BE HARD CODED.
+        
+    FS MODULE
+        The node:fs module enables interacting with the file system in a way modeled on standard POSIX functions.
+
+        ACCESSING OS MODULE
+            To use the promise-based APIs:
+                const fs = require('node:fs/promises');
+            To use the callback and sync APIs:
+                const fs = require('node:fs');
+
+        SYNC APPROACH
+            fs.readFileSync(path[, options])
+                path <string> | <Buffer> | <URL> | <integer> filename or file descriptor
+                options <Object> | <string>
+                Returns: <string> | <Buffer>: Returns the contents of the path.
+
+                If the encoding option is specified then this function returns a string. Otherwise it returns a buffer.
+
+                WHY BUFFER IS THE DEFAULT
+                    1)universal binary representation: which can represent any content type(text, images, audio)
+                    2)flexibility: provides max flex to the dev.
+                    3)performance: Efficient by allowing direct memory manipulation for high speed data processing.
+                    4)Avoids assumptions about encoding: Dev has the responsiblity to interpret the buffer correctly, safer and +flex.
+
+            fs.writeFileSync(file, data[, options])
+                file <string> | <Buffer> | <URL> | <integer> filename or file descriptor
+                data <string> | <Buffer> | <TypedArray> | <DataView>
+                Returns undefined.
+
+                Creates the specified file in the path with the data.
+                If file exists, it just overwrites. 
+
+                HOW TO APPEND
+                    Include 3rd options parameter.
+                        {flag: 'a'}
+
+        ASYNC APPROACH 
+            fs.readFile(path[, options], callback)
+                path <string> | <Buffer> | <URL> | <integer> filename or file descriptor
+                options <Object> | <string>
+                    encoding <string> | <null> Default: null
+                    flag <string> See support of file system flags. Default: 'r'.
+                    signal <AbortSignal> allows aborting an in-progress readFile
+                callback <Function>
+                    err <Error> | <AggregateError>
+                    data <string> | <Buffer>
+
+                Asynchronously reads the entire contents of a file.
+                The callback is passed two arguments (err, data), where data is the contents of the file.
+                If no encoding is specified, then the raw buffer is returned.
+
+                EXAMPLE
+                    readFile('/etc/passwd', (err, data) => {
+                        if (err) throw err;
+                            console.log(data);
+                        }); 
+                                                
+            fs.writeFile(file, data[, options], callback)
+                file <string> | <Buffer> | <URL> | <integer> filename or file descriptor
+                data <string> | <Buffer> | <TypedArray> | <DataView>
+                options <Object> | <string>
+                    encoding <string> | <null> Default: 'utf8'
+                    mode <integer> Default: 0o666
+                    flag <string> See support of file system flags. Default: 'w'.
+                    flush <boolean> If all data is successfully written to the file, and flush is true, fs.fsync() is used to flush the data. Default: false.
+                    signal <AbortSignal> allows aborting an in-progress writeFile
+                callback <Function>
+                    err <Error> | <AggregateError>
+
+                When file is a filename, asynchronously writes data to the file, replacing the file if it already exists. data can be a string or a buffer.
+                If options is a string, then it specifies the encoding:
+
+        SYNC VS ASYNC
+            Depends on the apps requirements, regarding performance and responsiveness. 
+
+            SYNC
+                1)simple scrips or small tasks that run once.
+                2)initializing code: loading config files or initial data during the startup phase of an app.
+                3)debugging: can be easier to understant since it executes in a predictable manner.
+                
+            ASYNC
+                1)servers and network apps: handling incoming requests and connections, aync prevents blocking.
+                2)concurrent tasks: multiple i/o operations concurrently, async functions enable non-blocking execution.
+                3)large file ops: reading or writing large files, async keeps ops responsive, avoiding delays or unresponsiveness.
+
+    HTTP MODULE
+        Brief explanation here, in depth later in next section. 
+
+        EXPRESS
+            Abstraction on top of the http module used to create:
+                1)server side logic
+                2)api
+
+        http.createSever()
+            Returns a new instance of http.Server.
+
+            PARAMETERS
+                Callback function
+                    PARAMS
+                        req = incoming request from client
+                            req.url
+                                Contains the URL of the incoming request.
+                                Includes the path and any query string parameters WITHOUT PROTOCOL, HOST, PORT. 
+                        res = what we will be sending back 
+                            res.write() 
+                                used to send chunk of the res body to the client and called multiple times.
+                            res.end()
+                                to signal you are done sending data, and close the response. 
+                                Cannot call res.write() after calling res.end()
+                                If res.end() is not called, client will wait forever for the response to close.
+
+            EXAMPLE
+                const http = require('node:http');
+
+                // Create a local server to receive data from
+                const server = http.createServer((req, res) => {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    data: 'Hello World!',
+                }));
+                });
+
+                server.listen(8000);
+
+        server.listen()
+            Starts the HTTP server listening for connections. This method is identical to server.listen() from net.Server.
+
+        EXAMPLE OF RECEIVING A REQUEST
+            const http = require('http');
+            const server = http.createServer((req, res) => {
+                if(req.url === '/'){
+                    res.end('Welcome to our home page')
+                    return
+                }
+                if(req.url === '/about'){
+                    res.end('Here is our short history')
+                    return
+                }
+                res.end(`
+                    <h1>Oops!</h1>    
+                    <p>We can not seem to find the page you are looking for</p>
+                    <a href="/'>back home </>
+                `)
+
+            })
+
+            server.listen(5000)
+
+NPM (Node package manager)
+    THINK ABOUT THIS 
+        Imagine you need a slider in your app. Well, someone else probably also did, and built it and left it in npm so we can use. 
+
+    HOW TO INSTALL NPM
+        NPM is Node's default package manager installed at the same time that node is installed. 
+
+    WHAT DOES NPM ALLOW US:
+        1)use our own code in other projects
+        2)use other peoples code 
+        3)share our own solutions with others
+
+    WHAT CAN WE DOWNLOAD FROM NPM 
+        1)libraries
+        2)frameworks
+
+    TYPICAL NODE PROJECT
+        Will have more than few NPM packages installed.
+
+    Modules        
+        A module in Node.js is essentially any piece of code that can be loaded and used by other code using the require() function.
+
+        Types of Modules:
+            JavaScript File:
+                If you have a JavaScript file, like example.js, you can load it as a module using require('./example'). This file is now considered a module.
+            Folder with a package.json file:
+                If you have a directory (folder) and it contains a package.json file, Node.js will look at the "main" field in that package.json to determine which file to load as the module.
+                For example, if the package.json file contains "main": "index.js", Node.js will load index.js when the folder is required.
+            Important Note:
+                Not all modules are packages. A module only becomes a package when it has a package.json file. This means any JavaScript file can be a module, but to be a package, it needs that package.json file.
+
+    Packages
+        A package is a specific type of module that includes a package.json file. This package.json file contains metadata about the module, such as its name, version, entry point, dependencies, and more.
+        
+        Key Points About Packages:
+            Package.json:
+                The package.json file is the heart of a package. 
+                It describes the package and provides important information that tools like npm (Node Package Manager) use to manage the package.
+                
+                WHY IS IT IMPORTANT
+                    1)allows us to hide the node_modules when uploading repo to github 
+                    2)when we clone and bring back the repo to local, it allows us to run "npm install"
+                    3)npm will check the package json, see the missing dependencies and setup and install them 
+
+            Publishing to npm:
+                For a module to be published to the npm registry (a public database of packages), it must contain a package.json file. This file is essential for others to be able to install and use the package.
+    
+    COMMANDS TO USE IN PROJECT
+        npm --version
+            ASk for the specific version of npm installed
+        npm i <packagaName> 
+            local dependency - use only in particular project
+        npm i -g <packageName>
+            global dependency - use it in any project
+        CREATING PACKAGE JSON
+            1)npm init
+                step by step approach
+            2)npm init -y
+                everything by default 
+
+    COMMANDS TO UNINSTALL
+        
+
+    USING PACKAGES
+        1)install package so node can find it
+        2)const _ = require('<packageName')
+
+    .gitignore
+        A .gitignore file is a special file in a Git repository that tells Git which files or directories to ignore and not track. 
+
+
+PUSH DIRECTORY FROM LOCAL TO GITHUB REMOTE REPO
+    git init:
+        Purpose: 
+            Initializes a new Git repository in your local directory. This command creates a .git directory that contains the metadata and configuration for your repository.
+        What If It Was Missing?: 
+            Without git init, your local directory wouldn’t be recognized as a Git repository, and you wouldn’t be able to track changes, commit, or push to GitHub.
+
+    git add .:
+        Purpose: 
+            Stages all changes (new, modified, and deleted files) in the current directory and its subdirectories for the next commit. The . signifies that you want to add all files in the directory.
+        What If It Was Missing?: 
+            If you skipped this step, your changes wouldn’t be included in the commit. The commit would only include files that were explicitly staged.
+
+    git commit -m "Your commit message":
+        Purpose: 
+            Commits the staged changes to the local repository with a message describing the changes. The -m flag is used to provide a commit message inline.
+        What If It Was Missing?: 
+            Without committing, your changes are only staged but not recorded in the history. You would need to make another commit later to include those changes.
+
+    git remote add origin onlinegithubrepourl.
+        Purpose: 
+            This command is slightly incorrect in syntax. The correct command is git remote add origin onlinegithubrepourl. It adds a remote repository named origin and links it to the URL of your GitHub repository.
+        What If It Was Missing?: 
+            If you don’t add a remote repository, you can’t push your local commits to GitHub. You need a remote repository to store and share your changes.
+
+    git branch -M main:
+        Purpose: 
+            Renames the current branch to main. The -M flag forces the rename, even if a branch named main already exists.
+        What If It Was Missing?: 
+            If your GitHub repository uses main as the default branch and you don’t rename your branch, you might push to a branch with a different name, which could cause confusion or mismatched branches.
+
+    git push -u origin main:
+        Purpose: 
+            Pushes your local commits to the main branch of the remote repository named origin. The -u flag sets the upstream tracking relationship, so future git push commands will default to this branch.
+        What If It Was Missing?: 
+            Without this push, your local commits wouldn’t be uploaded to GitHub. You would see your changes only locally, and your remote repository would remain empty.
+
+
+NODEMON
+    Wrapper for application in which it monitors files in project directory to restart the server automatically when it detects changes.
+
+    GLOBAL INSTALL
+        npm install -g nodemon
+
+    DEV DEPENDENCY 
+        npm install --save-dev nodemon
+        npm install -D nodemon
+
+    COMMAND TO RUN 
+        nodemon app.js
+    
+DEV DEPENDENCIES 
+    Packages or dependencies only needed during dev process. 
+    Not required for the application to run in a production environment. 
+
+    INSTALLATION
+        --save-dev
+        -D flag
+
+
+SCRIPTS
+    custom commands that can be used with npm or yarn.
+
+    "RUN" NOT NEEDED
+        start
+        test
+        stop
+        restart
+
+
+PACKAGE-LOCK.JSON
+    Records the exact versions of every package installed in your project.
+
+
+EVENT LOOP 
+    Is what allows node to perform non - blocking I/O operations despite te fact that js is single-threaded BY offloading operations to the system kernel whenever possible.
+
+    ORDER OF EXECUTION
+        We run the immediate code first, and until that is done we run the offloaded callback. 
+
+
+ASYNC PATTERNS 
+    WHY
+        Using callback to avoid blocking patterns can get really messy when we nest various layers deep.
+
+    CALLBACK EXAMPLE
+        const getText = (path) => {
+            return new Promise((resolve, reject) => {
+                readFile(path, 'utf8', (err, data) => {
+                    if(err){
+                        reject(err)
+                        return 
+                    }
+                    else{
+                        resolve(data)
+                    }
+                })
+            })
+        }
+        
+        getText('./content/second.txt')
+           .then(result => console.log(result))
+           .catch(err => console.log(err))
+
+    PROMISE EXAMPLE
+        const start = async () => {
+            const first = await getText('./content/first.txt')
+            console.log(first)
+        }
+        start()
+        
+    PROMISIY
+        Is a utility that converts callback based functions into a function that returns a PROMISE.
+
+        WHY
+            Useful when working with older Node.js APIs or other callback-based functions, as it allows you to work with them using modern Js features like:
+                async / await
+                .then() .catch()
+
+        HOW "PROMISIFY WORKS"
+            1)callback based functions
+                Many nodejs functions, especially the ones in the core module follow a pattern where the last argument is a callback function that gets called when the operation is complete.
+
+                EXAMPLE
+                    const fs = require('fs');
+                    fs.readFile('path/to/file.txt', 'utf8', (err, data) => {
+                        if (err) {
+                            console.error(err);
+                            return;
+                        }
+                        console.log(data);
+                    });
+
+            2)Using promisify to convert a promise based function
+                The promisify function converts a function like fs.readFile into a version that returns a promise instead of using a callback.
+
+                EXAMPLE
+                    const { promisify } = require('util');
+                    const fs = require('fs');
+
+                    // Promisify the readFile function
+                    const readFileAsync = promisify(fs.readFile);
+
+                    // Use the promisified function
+                    readFileAsync('path/to/file.txt', 'utf8')
+                        .then(data => console.log(data))
+                        .catch(err => console.error(err));
+
+            3)Internal Workings
+                1)PROMISIFY wraps the original callback in a new function that returns a PROMISE.
+                2)calling the promisified function, executes the original function.
+
+
+EVENT - DRIVEN PROGRAMMING
+    Paradigm in which the flow of the program is determined by events such as user actions(mouse click, key presses).
+    Instead of the program running a predetermined sequence, it responds to various events that occur during its execution.
+
+    EVENTS
+        Actions or ocurrence recognized by the software that may be handled by the software.
+    EVENT HANDLERS
+        Callback function executed in response to an event.
+    EVENT LOOP
+        Structure that waits for events and triggers the corresponding event handlers.
+    LISTENERS
+        Constructs that listen for events and specify which event handler should be invoked.
+
+
+EVENT EMITTER MODULE
+    Core module that provides a way to handle async events. 
+    Backbone of the event-driven architecture in Node.js, enabling objects to emit events and respond to them using listeners. 
+        
+    EMITTING EVENTS
+        An instance of 'eventEmitter' can emit named events. When an event is emitted, any listener registered for that event will be invoked.
+
+    LISTENING TO EVENTS
+        You can register listeners(callback functions) for specific events. When the event is emitted, these will be called. 
+
+    EVENT-DRIVEN ARCHITECTURE
+        The event emitter class allows node to manage async operations and inter module communications through a common interface.
+
+    EventEmiiter.on()
+        Method to attach a listener(callback function) to a specific event.
+        When the event is emitted, the attached listener will be invoked. 
+
+        SYNTAX
+            eventEmitter.on(eventName, listener)
+
+        NUMBER OF LISTENERS FOR EVENT
+            We can have as many listeners as we want, and the handlers will be called in order. 
+
+    EventEmiter.emit()
+        Method to trigger an event, causing all listeners attached to that event to be called in order they were registered.
+
+        SYNTAX
+            eventEmitter.emit(eventName, [...args])
+        
+    EXAMPLE 
+        const EventEmitter = require('events')
+        const customEmitter = new EventEmitter()
+
+        customEmitter.on('response', () => {
+            console.log('data received')
+        })
+
+        customEmitter.emit('response')
+
+    ORDER OF EXECUTION
+        1)listen first
+        2)emit later
+
+    EXAMPLE 2
+        myEmitter.on('event', function firstListener() {
+            console.log('Helloooo! first listener');
+        });
+        
+        myEmitter.on('event', function secondListener(arg1, arg2) {
+            console.log(`event with parameters ${arg1}, ${arg2} in second listener`);
+        })
+        
+        myEmitter.on('event', function thirdListener(...args) {
+            const parameters = args.join(', ');
+            console.log(`event with parameters ${parameters} in third listener`);
+        });
+
+        console.log(myEmitter.listeners('event'));
+
+        myEmitter.emit('event', 1, 2, 3, 4, 5);
+
+        // Prints:
+            // Helloooo! first listener
+            // event with parameters 1, 2 in second listener
+            // event with parameters 1, 2, 3, 4, 5 in third listener
+
+    HOW HTTP MODULE AND SERVER EMIT AN EVENT
+        When a server instance is created with 'http.createServer()', this instance IS AN EVENT EMITTER that can emit events during the servers lifecycle, such as when an http request is received. 
+
+        REQUEST EVENT
+            1)http.server object emits a 'request' event every time an incoming http request is received 
+            2)this event is emitted internally by the server when a client sends an http request(GET or POST) to the server.
+        EVENT EMISSION IN ACTION 
+            1)when the server receives a request, it triggers the 'request' event. If there is a listener attached to this, it will be called with the 'req' 'res' objects.
+            2)'req' object contians information about the incoming request and 'res' object is used to end a response back to the client. 
+
+        TWO WAYS TO CREATE A SERVER
+            1)using a callback function directly 
+                const http = require('http');
+                const server = http.createServer((req, res) => {
+                    res.end('Welcome');
+                });
+                server.listen(5000);
+
+                EXPLANATION
+                    1)this callback function is automatically registered as a listener for the 'request' event.
+                    2)every time the server receives an http request, this callback function is invoked, 'req' and 'res' as params
+                USAGE
+                    1)simplicity: ideal for small apps or when you only need to handle the request event
+
+            2)using the event emitter api 
+                const http = require('http');
+                const server = http.createServer();
+
+                // Emit the 'request' event
+                server.on('request', (req, res) => {
+                    res.end('Welcome');
+                });
+
+                server.listen(5000);
+
+                EXPLANATION
+                    1)server is created without callback being passed.
+                    2)instead, we manually attach a listener to the 'request' event using 'server.on('request', ...)'
+                    3)when server receives the client http request, the 'request' event is emitted, and the attach listener is invoked.
+                    4)server responds with 'welcome'
+
+                USAGE
+                    1)flexibility: we can attach multiple listeners for the same event 
+
+
+STREAMS 
+    Essential concept that handles reading or writing data CONTINOUSLY, typically dealing with large data sets in an efficient manner. 
+    Allow to work with the data sequentially, without needing to load the entire dataset into memory at once. 
+
+    BUFFER
+        1)Temporary storage spot for a chunk of data that is being transferred from one place to another. 
+        2)The buffer is filled with data, then passed along.
+        3)Transfer small chunks of data at a time. 
+
+    EXAMPLE
+        Literally using buffers to transfer data and being able to stream them before they have finished loading completely. 
+
+    USAGE
+        Consume data bit by bit before it is being sent completely. 
+
+    USEFUL FOR:
+        1)handling large files
+        2)network requests 
+        3)other I/O operations
+
+    TYPES IN NODE
+        Writeable 
+            Used to write data to a destination
+        Readable
+            Used to read data from a source
+        Duplex
+            Both readable and writable, meaning you can read and write to the same stream.
+        Transform
+            A type of duplex stream where the output is a transformation of the input. 
+
+    KEY CONCEPTS 
+        Chunk based Processing
+            Streams process data in chunks rather than loading it all at once. This means you can start processing data before the entire dataset is available, which is more memory efficient. 
+        
+        Event-Driven
+            Streams are instances of the 'Event-Emitter' class and emit various events during their lifecycle, such as:
+                1)data
+                2)end
+                3)error
+                4)finish
+
+    EVENTS AND OTHER MODULES IN NODE 
+        Implement streaming interface 
+
+    EXTENDS EVENT EMITTER CLASS
+        We can use events like data and end in streams.
+
+    createReadStream()
+        fs.createReadStream() is used to create a readable stream that allows you to read data from a file in chunks, rather than loading the entire file into memory.
+
+        EXAMPLE
+            const fs = require('fs');
+            const readableStream = fs.createReadStream('path/to/file.txt', { encoding: 'utf8' });
+
+        HOW IT WORKS
+            1)When you create a readable stream using fs.createReadStream(), the stream begins reading the file in chunks.
+            2)As each chunk is read, a 'data' event is emitted, allowing you to process the chunk.
+            3)Once the entire file has been read, an 'end' event is emitted.
+            4)If an error occurs during reading, an 'error' event is emitted.    
+
+        EXAMPLE
+            const fs = require('fs');
+
+            const readableStream = fs.createReadStream('example.txt', { encoding: 'utf8' });
+
+            readableStream.on('data', (chunk) => {
+                console.log('Received chunk:', chunk);
+            });
+
+            readableStream.on('end', () => {
+                console.log('No more data to read.');
+            });
+
+            readableStream.on('error', (err) => {
+                console.error('An error occurred:', err.message);
+            });
+
+
+    createWriteStream()
+        fs.createWriteStream() is used to create a writable stream that allows you to write data to a file in chunks, rather than writing it all at once.
+
+        EXAMPLE
+            const fs = require('fs');
+            const writableStream = fs.createWriteStream('path/to/output.txt', { encoding: 'utf8' });
+
+        HOW IT WORKS
+            1)When you create a writable stream using fs.createWriteStream(), you can write data to the file incrementally by calling the .write() method.
+            2)Once all the data has been written, you should call the .end() method to signal the end of the writing process.
+            3)After calling .end(), the 'finish' event is emitted.
+            4)If an error occurs during writing, an 'error' event is emitted.
+
+        EXAMPLE
+            const fs = require('fs');
+            const writableStream = fs.createWriteStream('output.txt');
+
+            writableStream.write('Hello, ');
+            writableStream.write('world!\n');
+            writableStream.end('This is the end.\n');
+
+            writableStream.on('finish', () => {
+                console.log('All data has been written to the file.');
+            });
+
+            writableStream.on('error', (err) => {
+                console.error('An error occurred:', err.message);
+            });
+
+    HTTP STREAM EXAMPLE
+        var http = require('http')
+        var fs = require('fs')
+
+        http
+        .createServer(function (req, res) {
+            // const text = fs.readFileSync('./content/big.txt', 'utf8')
+            // res.end(text)
+            const fileStream = fs.createReadStream('./content/big.txt', 'utf8')
+            fileStream.on('open', () => {
+            fileStream.pipe(res)
+            })
+            fileStream.on('error', (err) => {
+            res.end(err)
+            })
+        })
+        .listen(5000)
+
+SECTION 4: EXPRESS 
+    GENERAL EXHANGE OF DATA ON WEB 
+        1)client performs http request and sends that to server
+        2)server receives the request and sends the response back to the client
+      
+    EXPRESS
+        Abstraction on top of the http and event emitter modules to create:
+            1)server side logic
+            2)api 
+        
+    SERVER
+        Computer whose job is to always make the request resources availble
+        No GUI 
+        Really big, logic to handle server side logic
+        Always available 
+
+    HTTP REQUEST STRUCTURE 
+        1)header
+            meta info
+        2)body(PAYLOAD)
+            optional info 
+        3)method
+            action on http
+
+            TYPES
+                GET(default)
+                POST
+                PUT 
+                DELETE
+        4)url
+            location that receives the request
+        5)remote address
+            ip address returned from converting the url through the dns protocol
+
+    
+    
+    
+        
+
+
+
+    
+        
+                    
+
+    
+    
+
+
+    
+                
+
+            
+
+
+
+            
+
+
+
+
+
+        
+
+
+
+
+
+    
+
+
+    
+-->
