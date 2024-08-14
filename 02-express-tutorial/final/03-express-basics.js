@@ -18,10 +18,18 @@ app.listen(5000, () => {
   console.log('server is listening on port 5000...')
 })
 
-// app.get
-// app.post
-// app.put
-// app.delete
-// app.all
-// app.use
-// app.listen
+//Most used express methods 
+//app.get
+    //Used to retrieve a resource from server
+//app.post
+    //Insert a resource to a server
+//app.put
+    //Edit a resource from a server
+//app.delete
+    //Remove a resource from a server
+//app.all
+    //Can use all verbs and actions
+//app.use
+    //Middleware
+//app.listen
+    //listen for client http requests 
