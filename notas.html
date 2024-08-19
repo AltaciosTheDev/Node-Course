@@ -5,6 +5,10 @@ LEARN NODE WITH REAL-WORLD APPLICATIONS WITH NODE JS, EXPRESSS, MONGO DB
             1)general idea
             2)no slideville
             3)practical implementation to deepen understanding
+        project based
+            1)small project first specific topic
+            2)solid understanding of moving parts
+            3)big and complex project 
 
 WHAT IS NODE JS
     Environment to run javascript out of the browser
@@ -23,6 +27,10 @@ STRUCTURE
     3)nodejs fundamentals 
     4)express js 
     5)after fundamentals, build node js apps
+
+FUN FACTS
+    Express provides the req and res as arguments automatically when using MVC archiquecture 
+
 
 SECTION 2: INSTALLING NODE --------------------------------------------------------
 
@@ -827,38 +835,657 @@ STREAMS
         .listen(5000)
 
 SECTION 4: EXPRESS 
-    GENERAL EXHANGE OF DATA ON WEB 
-        1)client performs http request and sends that to server
-        2)server receives the request and sends the response back to the client
-      
-    EXPRESS
-        Abstraction on top of the http and event emitter modules to create:
-            1)server side logic
-            2)api 
+    PROLOGUE
+        GENERAL EXHANGE OF DATA ON WEB 
+            1)client performs http request and sends that to server
+            2)server receives the request and sends the response back to the client
         
-    SERVER
-        Computer whose job is to always make the request resources availble
-        No GUI 
-        Really big, logic to handle server side logic
-        Always available 
+        EXPRESS
+            Abstraction on top of the http and event emitter modules to create:
+                1)server side logic
+                2)api 
+            
+        HTTP REQUEST STRUCTURE 
+            1)header
+                meta info
+            2)body(PAYLOAD)
+                optional info 
+            3)method
+                action on http
 
-    HTTP REQUEST STRUCTURE 
-        1)header
-            meta info
-        2)body(PAYLOAD)
-            optional info 
-        3)method
-            action on http
+                TYPES
+                    GET(default)
+                    POST
+                    PUT 
+                    DELETE
+            4)url
+                location that receives the request
+            5)remote address
+                ip address returned from converting the url through the dns protocol
 
-            TYPES
-                GET(default)
-                POST
-                PUT 
-                DELETE
-        4)url
-            location that receives the request
-        5)remote address
-            ip address returned from converting the url through the dns protocol
+        SERVER
+            Computer that provides service or resource to other computers, known as clients over a network. 
+
+            SERVICES CAN BE:
+                1)host websites
+                2)manage databases
+                3)store files 
+                4)run applications
+
+            SERVER SOFTWARE
+                term server really refers to the software that runs on either a physical or virtual machine whose primary purpose is to listen for requests from clients and respond to them.
+
+        PORT
+            Numerical identifier to differentiate between types of network traffic or services running on the same server. 
+            Requests are sent to a specific IP adrres and a port number.
+
+            HOW IT WORKS
+                Imagine a server as a large office building, and each port is like an office. When the request is send, the port number ensures that the request is delivered to the correct service inside the server. 
+
+        HTTP BASICS
+            const http = require('http')
+                Way to import the module that will allow us to create a server
+
+            const server = http.createServer((req, res) => {
+                res.end('home page')
+            })
+
+            response.end()
+                Signals to the server all of the response header and body has been sent, consider the message complete.
+                MUST be called on each response. 
+
+            req, res
+                Sent by the client and we have access to manage the server side logic
+
+        HTTP HEADERS
+            res.writeHead()
+                Instance of the http.ServerResponse object AND used to set status code and HTTP headers for the respone that will be send to the client.
+                
+                SYNTAX
+                    res.writeHead(statusCode[,statusMessage][, headers])
+
+            STATUS CODE
+                3 digit number that indicates the result of the http request. 
+
+            MIME TYPE
+                Content-Type
+                Content-Length
+                Set-Cookie
+
+        HTTP REQUEST OBJECT
+            The request object ('req') is an instance of the 'http.IncommingMessage' class, representing the incoming HTTP request made by a client to the server. 
+
+            req.method()
+                Contains the http method used for the request, indicating the type of action client wants to perform.
+
+            req.url()
+                Contains the URL path of the request, including the query string if any.
+
+            req.headers
+                Object representing the http headers sent by the clent, each header being a key - value pair. 
+
+            req.query
+                Contains an object representing the parsed query string parameters from the url
+
+            req.params
+                Object containing route parameters
+
+            req.body
+                This property contians the parsed body of the request. 
+
+        HTTP - HTML FILE 
+            We can have an html file, and we can pass the content of the file to the client. 
+            This way we avoid have to write line by line the entirety of the html.
+
+            PROCESS
+                1)separate the html content in a file
+                2)read the content of the file with either of the functions of the fs module that allow for that
+                3)send conent in the res object with the write()
+
+            ERRORS
+                Only the html page gets sent, no css, no images, no js file. 
+
+                WHY
+                    The html file references the other resources so the browser goes ahead and requests for them.
+
+                SOLUTION
+                    We would have to manually request ALL the files and write the if statements for the URL the browser asks for. 
+
+            EXAMPLE
+                const http = require('http')
+                const {readFileSync} = require('fs')
+
+                //get all files
+                const homePage = readFileSync('./navbar-app/index.html')
+                const homeStyles = readFileSync('./navbar-app/styles.css')
+                const homeImage = readFileSync('./navbar-app/logo.svg')
+                const homeLogic = readFileSync('./navbar-app/browser-app.js')
+
+
+                const server = http.createServer((req,res) => {
+                    //console.log(req.method)
+                    const url = req.url
+                    //home page
+                    if(url == '/'){
+                        res.writeHead(200, {'content-type': 'text/html'})
+                        res.write(homePage)
+                        res.end()
+                    }
+                    //about page 
+                    else if(url === '/about'){
+                        res.writeHead(200, {'content-type': 'text/html'})
+                        res.write('<h1>about page</h1>')
+                        res.end()
+                    }
+                    //styles
+                    else if(url === '/styles.css'){
+                        res.writeHead(200, {'content-type': 'text/css'})
+                        res.write(homeStyles)
+                        res.end()
+                    }
+                    //image/logo
+                    else if(url === '/logo.svg'){
+                        res.writeHead(200, {'content-type': 'image/svg+xml'})
+                        res.write(homeImage)
+                        res.end()
+                    }
+                    //js logic
+                    else if(url === '/browser-app.js'){
+                        res.writeHead(200, {'content-type': 'text/javascript'})
+                        res.write(homeLogic)
+                        res.end()
+                    }
+                    //404
+                    else{
+                        res.writeHead(404, {'content-type': 'text/html'})
+                        res.write('<h1>404 resource not found</h1>')
+                        res.end()
+                    }
+                })
+
+                server.listen(5000)
+
+    EXPRESS BASICS
+        Minimal and flexible node.js web application framework that provides a robust set of features for web and mobile applications. 
+
+    APIs
+        Miriad of HTTP utility methods and middleware at your disposal, creating a robust API is quick and easy.
+
+    PERFORMANCE
+        Thin layer of fundamental web application features, without obscuring Node.js features that are loved by the community. 
+
+    MOST USED EXPRESS METHODS
+        app.get
+        app.post
+        app.put
+        app.delete
+        app.all
+        app.use
+        app.listen
+
+    BASIC ROUTING
+        Refers to how an app responds to a client request to a particular endpoint:
+            1)specific URI
+            2)specific HTTP request method 
+
+        SYNTAX
+            app.METHOD(path handler)
+
+        WHERE:
+            APP:Instance of express
+            METHOD: htpp request method
+            PATH: path on the server
+            HANDLER: function executed when route is matched
+    
+        EXAMPLES
+            app.get('/', (req, res) => {
+                res.send('Hello World!')
+            })
+            
+            app.post('/', (req, res) => {
+                res.send('Got a POST request')
+            })
+
+            app.put('/user', (req, res) => {
+                res.send('Got a PUT request at /user')
+            })
+
+            app.delete('/user', (req, res) => {
+                res.send('Got a DELETE request at /user')
+            })
+
+    res.send()
+        Used to send a response back to the client. 
+
+        Automatic Content-Type: 
+            If you send a string, Express sets the Content-Type to text/html. If you send an object or array, it sets Content-Type to application/json.
+        Response Termination: 
+            res.send() ends the response process, so you don't need to call res.end() afterward.
+        Chaining: 
+            You can chain other response methods like res.status() before res.send() to set the HTTP status code.
+
+            EXAMPLE
+                res.status(200).send('Success')
+
+    BASIC EXPRESS APP
+        res.sendFile()
+            Used to send a file as an http response to the client. Particularly useful when you need to serve static files like HTML, images, PDFs, or any other type of file stored on your server.
+
+            EXAMPLE
+                const express = require('express');
+                const path = require('path');
+                const app = express();
+
+                app.get('/file', (req, res) => {
+                    const filePath = path.join(__dirname, 'public', 'example.pdf');
+                    res.sendFile(filePath);
+                });
+
+                app.listen(3000, () => {
+                    console.log('Server is running on port 3000');
+                });
+            
+            ABSOLUTE PATH
+                res.sendfile() requires an absolute path to the file.
+
+                If using relative path, create absolute path with:
+                    1)path.join()
+                    2)path.resolve()
+
+            CONTENT-TYPE
+                Express automatically sets the 'Content-Type' header based on the file's MIME type. 
+
+            ERROR HANDLING
+                If the file does not exist or theres an error in sending it, express will auto handle it and send 404 or 500 response until specified otherwise. 
+
+        NODE BUILT IN DEFAULT DIRECTORY METHODS
+            Methods provided by nodes built in path module, which help work with file and directory paths in a way THATS PLATFORM INDEPENDNENT. 
+
+            path.join()
+                Combines multiple path segments into a single path. Normalizes the resulting path, handling any redundant separators(slashes) or relative segments(.. or .)
+                
+
+            path.resolve()
+                Resolves a sequence of paths or path segments into an absolute path. Starts by working from the last parameter, to the last on the left, combining each segment along the way. 
+
+                If no absolute path is provided, path.resolve() will use the current working directory as the starting point. 
+
+                EXAMPLE
+                    const path = require('path');
+                    const resolvedPath = path.resolve('users', 'john', 'documents', 'file.txt');
+                    console.log(resolvedPath);
+                    // Output: '/current/working/directory/users/john/documents/file.txt'
+                
+            DIFFERENCES
+                1).join() simply concatenates and normalizes while resolve() always returns and absolute path.
+                2).resolve() uses current directory while .join() does not
+            
+        DEALING WITH STATIC ASSETS IN EXPRESS
+            app.use(express.static()) middleware in Express.js is used to serve static files such as: 
+                1)HTML
+                2)CSS
+                3)JAVASCRIPT
+                4)IMAGES
+                
+            HOW IT WORKS
+                1)Express will look in the specified directory for any requested file. If it is found, will serve it directly without needing addiotional logic.
+                2)The path specified is relative to the directory from which the node process launches
+                3)If a request matches a file within the static directory, express will serve that file. If not, will continue for another route or middleware to handle the request. 
+
+        SPECIFICALLY DEALING WITH SENDING INDEX.HTML
+            1)Adding file to static assets
+            2)Server Side Rendering
+
+    API VS SSR
+        API
+            http interface to interact with data
+            JSON()
+                data format to send information from the api 
+            res.json()
+
+        SSR
+            Send entire html and js template
+            res.render()
+
+    JSON - BASICS
+        res.json(body)
+            Sends a JSON response. This method sends a response that is the parameter converted to a JSON string using JSON.stringify()
+
+    ROUTE PARAMS
+        Route parameters are named URL segments that are used to capture the values specified at their position in the URL. The captured values are populated in the req.params object, with the name of the route parameter specified in the path as their respective keys.
+
+        EXAMPLE
+            Route path: /users/:userId/books/:bookId
+            Request URL: http://localhost:3000/users/34/books/8989
+            req.params: { "userId": "34", "bookId": "8989" }
+
+    QUERY STRING PARAMS
+         They are used to filter, sort, or provide additional options for a request. Multiple query parameters can be separated by an ampersand (&).
+         
+         EXAMPLE SERVER ENDPOINT
+            pp.get('/search', (req, res) => {
+                const query = req.query.q;
+                const page = req.query.page;
+                res.send(`Search query: ${query}, Page: ${page}`);
+            });
+
+        EXAMPLE CLIENT REQUEST URL 
+            http://localhost:3000/search?q=nodejs&page=2
+
+        CAPTURED IN EXPRESS
+            const query = req.query.q;    // "nodejs"
+            const page = req.query.page;  // "2"
+
+    DIFFERENCES BETWEEN ROUTE PARAMETERS AND QUERY PARAMETES
+        Position in URL:
+            Route Parameters are part of the URL path itself (e.g., /users/123).
+            Query Parameters are appended to the URL after a question mark (e.g., /search?q=nodejs&page=2).
+        Purpose:
+            Route Parameters are used to define specific resources (like identifying a user by ID).
+            Query Parameters are used to refine or filter the results of a resource (like searching or paginating results).
+        Express Access:
+            Route Parameters are accessed using req.params.
+            Query Parameters are accessed using req.query.
+
+    Example Combined Use Case:
+        app.get('/users/:userId/posts', (req, res) => {
+            const userId = req.params.userId;  // Route parameter
+            const sortBy = req.query.sortBy;   // Query parameter
+            const limit = req.query.limit;     // Query parameter
+            res.send(`User ID: ${userId}, Sort By: ${sortBy}, Limit: ${limit}`);
+        });
+
+    MIDDLEWARE
+        Functions that execute during the http request-response cycle and have access to:
+            1)request object
+            2)response object
+            3)next middleware function
+
+        They can:
+            1)execute any code
+            2)make changes to the request and response objects
+            3)end the request - response cycle
+            4)call the next middleware function
+
+        Practical uses for middleware:
+            1)logging
+            2)authentication
+            3)data parsing
+
+        Without middleware:
+            Any change made to the req object would have to be handled in EVERY SINGLE ROUTE.
+
+        Usefulness:
+            1)code reusability:
+                Allows to reuse code across different routes 
+            2)modularity:
+                Breaks down logic into smaller reusable components.
+            3)Request Lifecycle management
+                Modify request response objects, stop cycle, pass control of cycle to next function
+            4)Error Handling
+                Catch and handle erros throughout the application, consistent way to manage errors and responses.
+            5)security
+                adding sec features
+
+        SYNTAX 
+           function middlewareFunction(req, res, next) {
+                // Perform operations here
+                next(); // Pass control to the next middleware
+            }
+
+        TYPES OF MIDDLEWARE FUNCTIONS:
+            Application-Level Middleware
+                1)defined directly on the 'app' object using app.use() or app.METHOD()
+                2)Can be executed for every request to the app or for specific routes
+
+                EXAMPLE
+                    const express = require('express');
+                    const app = express();
+
+                    app.use((req, res, next) => {
+                            console.log('Time:', Date.now());
+                        next(); // Pass control to the next middleware function
+                    });
+
+                    app.get('/', (req, res) => {
+                        res.send('Home Page');
+                    });
+
+                    app.listen(3000);
+
+            Router Level Middleware:
+                1)Works similarly to application - level middleware but is bound to an instance of express.Router()
+                
+                EXAMPLE
+                    const express = require('express');
+                    const router = express.Router();
+
+                    router.use((req, res, next) => {
+                        console.log('Request URL:', req.originalUrl);
+                        next();
+                    });
+
+                    router.get('/', (req, res) => {
+                        res.send('Router Home');
+                    });
+
+                    const app = express();
+                    app.use('/router', router);
+
+                    app.listen(3000);
+
+            Built in Middleware:
+                Express comes with several built-in middleware functions such as:
+                    1)express.static(): For serving static files
+                        Purpose: 
+                            Serves static files, such as HTML files, CSS files, images, and JavaScript files, from a specified directory.
+                    2)express.json(): For parsing JSON
+                        Purpose: 
+                            Parses incoming requests with JSON payloads and makes the data available in req.body.
+                    3)express.urlencoded() for parsing URL-encoded data
+                        Purpose: 
+                            Parses incoming requests with URL-encoded payloads (like form submissions) and makes the data available in req.body.
+                        Options:
+                            extended: true: 
+                                Allows for rich objects and arrays to be encoded into the URL-encoded format, using the qs library. This is generally recommended.
+                            extended: false: 
+                                Uses the querystring library to parse URL-encoded data, which does not support nested objects.
+
+            Third Party Middleware:
+                You can install and use middleware provided by third parties, such as 'morgan' or 'helmet' for security
+
+                EXAMPLE
+                    const morgan = require('morgan')
+                    app.use(morgan('tiny')) log http requests 
+
+            Error - Handling Middleware:
+                Special middleware that handles errors with arguments: err, req, res, next.
+
+                EXAMPLE
+                    app.use((err, req, res, next) => {
+                        console.error(err.stack);
+                        res.status(500).send('Something broke!');
+                    });
+
+        ENDING REQUEST CYCLE
+            Without one of the following functions called in the middleware, the request - response cycle will continue forever. 
+            1)res.send()
+            2)next()
+
+        app.use()
+            By using app.use(), you can apply middleware globally across all routes in your application. This ensures that certain tasks (e.g., logging, authentication) are consistently performed for every request, regardless of the specific route.
+
+            2. Order of Execution
+                app.use() allows you to define the order in which middleware functions are executed. Since middleware functions are executed in the order they are added, you can strategically place them to ensure that specific operations are performed at the right time in the request-response cycle.
+
+                EXAMPLE
+                    app.use(authMiddleware);
+                    app.use(loggingMiddleware);
+                    app.use(errorHandlingMiddleware);
+
+            3. Path-Specific Middleware
+                You can use app.use() to apply middleware to specific routes or paths, rather than the entire application. This allows you to tailor the behavior of your app based on the requested URL.
+
+                EXAMPLE
+                    app.use('/admin', adminMiddleware); // Applies to all routes under /admin
+                    app.use('/api', apiMiddleware);     // Applies to all routes under /api 
+
+            4. Preprocessing Requests
+                Middleware registered with app.use() can preprocess incoming requests before they reach the route handlers. This Includes parsing JSON bodies, URL-encoded data, or performing other transformations on the req and res objects.
+
+                EXAMPLES
+                    app.use(express.json()); // Parse incoming JSON requests
+                    app.use(express.urlencoded({ extended: true })); // Parse URL-encoded dat
+
+        MORGAN MIDDLEWARE 
+            Morgan is a popular HTTP request logger middleware for Node.js applications, typically used with Express.js. It helps you log details about incoming requests to your server, which can be invaluable for debugging, monitoring, and analyzing traffic.
+
+            Key Features of Morgan
+                Customizable Formats:
+                    Morgan offers various predefined logging formats like combined, common, dev, short, and tiny. These formats determine how the logs will be structured and what information will be included.
+                Custom Tokens: 
+                    You can define custom tokens to include specific information in the logs.
+                Flexible Output: 
+                    Logs can be directed to different outputs, such as the console, a file, or even a logging service.
+                Stream Support: 
+                    Morgan allows you to specify a stream where the logs should be written, giving you control over where the logs are stored.
+
+    MVC 
+        MVC stands for Model-View-Controller. It's a software architectural pattern used for designing web applications, separating the application into three interconnected components. This separation helps manage complexity, organize code, and maintain scalability. Here's a breakdown of each component:
+
+        1. Model:
+            What It Does: 
+                The Model represents the data and the business logic of the application. It handles data-related operations such as fetching data from a database, processing it, and returning it to the controller.
+            Example: 
+                In a blogging application, the Model would represent entities like Post, Comment, or User. It might include methods to save a new post to the database or retrieve all comments associated with a particular post.
+
+        2. View:
+            What It Does: 
+                The View is responsible for presenting data to the user. It generates the user interface (UI) based on the data provided by the Model, typically in the form of HTML, CSS, and JavaScript.
+            Example: 
+                Continuing with the blogging application, the View would be the part that generates the web page displaying a blog post and its comments. It formats the data received from the Model into a readable and visually appealing format.
+            3. Controller:
+            What It Does: 
+                The Controller acts as an intermediary between the Model and the View. It handles user input, manipulates data through the Model, and sends the appropriate data back to the View. Essentially, it processes incoming requests, applies the necessary business logic, and returns the appropriate response.
+            Example: 
+                In our blogging application, if a user submits a new comment, the Controller will receive the data from the user's request, use the Model to save the comment to the database, and then redirect the user back to the post's View with the updated list of comments.
+
+        How MVC Works Together:
+            Flow: 
+                When a user interacts with a web application (e.g., clicking a button or submitting a form), the request is first handled by the Controller.
+            Controller: 
+                The Controller processes the user input, interacts with the Model if necessary, and decides which View to render.
+            Model: 
+                The Model performs data operations, such as fetching, updating, or deleting data, and sends the results back to the Controller.
+            View: 
+                The Controller passes the data to the View, which then generates the appropriate UI for the user.
+
+        Benefits of Using MVC:
+            Separation of Concerns: 
+                Each component has a distinct role, making the application easier to manage and scale.
+            Maintainability: 
+                Changes to the user interface (View) can be made independently of the business logic (Model).
+            Testability: 
+                Because components are separate, it’s easier to test each part in isolation
+
+        Example in a Web Application:
+            Imagine you're building a to-do list application:
+
+            Model: 
+                Defines a Task object with attributes like title, description, dueDate, and methods to save, delete, or update tasks.
+            View: 
+                Displays the list of tasks to the user and provides a form to add or edit tasks.
+            Controller: 
+                Handles user actions like adding a new task, marks a task as complete, or deletes a task. It interacts with the Model to update the data and then updates the View to reflect these changes.
+                    
+    express.router()
+        Use the express.Router class to create modular, mountable route handlers. A Router instance is a complete middleware and routing system; for this reason, it is often referred to as a “mini-app”.
+        
+        The following example creates a router as a module, loads a middleware function in it, defines some routes, and mounts the router module on a path in the main app.
+
+        EXAMPLE
+            const express = require('express')
+            const router = express.Router()
+
+            // middleware that is specific to this router
+            const timeLog = (req, res, next) => {
+            console.log('Time: ', Date.now())
+            next()
+            }
+            router.use(timeLog)
+
+            // define the home page route
+            router.get('/', (req, res) => {
+            res.send('Birds home page')
+            })
+            // define the about route
+            router.get('/about', (req, res) => {
+            res.send('About birds')
+            })
+
+            module.exports = router
+
+            const birds = require('./birds')
+            // ...
+
+            app.use('/birds', birds)
+
+    app.route()
+        You can create chainable route handlers for a route path by using app.route(). Because the path is specified at a single location, creating modular routes is helpful, as is reducing redundancy and typos. For more information about routes, see: Router() documentation.
+
+        EXAMPLE
+            app.route('/book')
+            .get((req, res) => {
+                res.send('Get a random book')
+            })
+            .post((req, res) => {
+                res.send('Add a book')
+            })
+            .put((req, res) => {
+                res.send('Update the book')
+            }) 
+
+
+SECTION 6: TASK MANAGER API 
+    GOALS
+        1)Setup and connect to cloud database to persist data
+        2)Learn CRUD operations on data
+        3)
+    
+        
+        
+
+    
+        
+            
+            
+
+        
+
+
+            
+                    
+        
+
+
+        
+
+        
+        
+            
+        
+
+        
+
+            
+
+            
+
+
+                
+
+
+        
 
     
     
