@@ -30,7 +30,7 @@ STRUCTURE
 
 FUN FACTS
     Express provides the req and res as arguments automatically when using MVC archiquecture 
-
+    If you invoke a function in a module, when you require that in another module, it will run the function.
 
 SECTION 2: INSTALLING NODE --------------------------------------------------------
 
@@ -1450,9 +1450,195 @@ SECTION 6: TASK MANAGER API
     GOALS
         1)Setup and connect to cloud database to persist data
         2)Learn CRUD operations on data
-        3)
-    
         
+    WHY /API CONVENTION?
+        Separation of concerns: Helps differentiate between routes that serve the web application pages, assets like images and tyles and routes that serve the API.
+
+        Clarity: Provides clear indication to devs and users that the route is related to the api and can tell that it is meant to return data, not a web page. 
+
+        EXAMPLE
+            domain/api/version/endpoint
+
+    GLOBAL VARIABLES IN POSTMAN 
+        In essence, global variables reduce redundancy, minimize errors, and streamline the workflow, making it easier to manage large and complex API testing projects.
+
+        EXAMPLE
+            {{baseUrl}}/users
+
+    REST API 
+        Representational State Transfer, most common API design pattern that determines how data looks like. 
+        HTTP interface in which other apps, most likely front end ones, can interact with out data. 
+
+        Combines:
+            HTTP verbs
+            Route paths
+            Resources
+
+    MONGO-DB 
+        1)NoSQL, NON Relational DB
+        2)Store JSON - does not care how data relates
+        3)collections instead of tables
+        4)documents instead of rows
+        5)easy to get started
+        6)free cloud hosting - atlas
+
+        Mongo DB Atlas
+            MongoDB Atlas is a fully-managed cloud database service for MongoDB, the popular NoSQL database. 
+
+            WHY USEFUL
+                Time-Saving: 
+                    No need to manage the underlying infrastructure. MongoDB Atlas handles everything from provisioning to backups and scaling.
+                Reliability: 
+                    Built-in features like replication, backups, and monitoring help ensure the reliability and stability of your databases.
+                Performance: 
+                    With auto-scaling and global data distribution, MongoDB Atlas is optimized for high performance across different geographies.
+                Focus on Development: 
+                    You can concentrate on building applications while Atlas handles database management.
+
+
+        INITIAL SETUP
+            1)create account
+            2)set cluster
+            3)set database
+            4)set user permission
+            5)set network permission
+            6)create collection
+            7)create documents 
+
+        MONGOOSE
+            Mongoose is an Object Data Modeling (ODM) library for MongoDB and Node.js. 
+            
+            It provides a schema-based solution for modeling your data and helps you interact with MongoDB in a more structured and organized way, especially when working with complex data models.
+
+            Why Mongoose is Useful:
+                Schema Enforcement:
+                    MongoDB is schema-less, which offers flexibility but can lead to inconsistent data structures. Mongoose enforces schemas, bringing structure and order to your data, making it easier to manage in the long term.
+                Validation
+                    Data validation is built into Mongoose, reducing the need to manually check data integrity in your application logic. This reduces errors and increases data consistency.
+                Easier Data Manipulation:
+                    Mongoose abstracts away a lot of the lower-level complexity involved with interacting with MongoDB. Its query building, schema enforcement, and document manipulation methods make working with MongoDB easier and less error-prone.
+                Support for Middleware:
+                    Mongoose’s middleware (hooks) helps with automating workflows, such as hashing passwords before saving user data or triggering specific actions after updating a document.
+                Relationships and Population:
+                    While MongoDB doesn’t natively support relationships like a relational database, Mongoose enables you to model and query relationships between documents in a clean and efficient way.
+                Object-Oriented Approach:
+                    Mongoose takes an object-oriented approach to interacting with MongoDB. It allows developers to model their data in a way that’s closer to how they structure their application logic, making the data more intuitive to work with.
+                Community and Ecosystem:
+                    Mongoose has a large community and a mature ecosystem, with extensive documentation and third-party packages, which means you'll have good support when working on projects.
+            
+            SCHEMA
+                Everything in Mongoose starts with a Schema. 
+                Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
+
+                EXAMPLE
+                    import mongoose from 'mongoose';
+                    const { Schema } = mongoose;
+
+                    const blogSchema = new Schema({
+                    title: String, // String is shorthand for {type: String}
+                    author: String,
+                    body: String,
+                    comments: [{ body: String, date: Date }],
+                    date: { type: Date, default: Date.now },
+                    hidden: Boolean,
+                    meta: {
+                        votes: Number,
+                        favs: Number
+                    }
+                    });
+
+            MODEL
+                Models are fancy constructors compiled from Schema definitions. 
+                An instance of a model is called a document. 
+                Models are responsible for creating and reading documents from the underlying MongoDB database.
+
+                ModelName = Singular name of the collection model is for. Mongoose looks for the plural lowercase
+
+                SYNTAX
+                    mongoose.model(modelName, Schema)
+
+                EXAMPLE
+                    const schema = new mongoose.Schema({ name: String, size: String });
+                    const Tank = mongoose.model('Tank', schema);
+
+                CONSTRUCTING MODEL 
+                    An instance of a model is called a document. Creating them and saving to the database is easy.
+
+                    EXAMPLE
+                        await Tank.create({ size: 'small' });
+
+                VALIDATION 
+                    At the moment the schema allows empty properties and empty objects. 
+
+                    Validation is defined in the SchemaType
+                    Validation is middleware. Mongoose registers validation as a pre('save') hook on every schema by default.
+
+                    Custom Error Messages
+                        You can configure the error message for individual validators in your schema. There are two equivalent ways to set the validator error message:
+
+                        Array syntax: min: [6, 'Must be at least 6, got {VALUE}']
+                        Object syntax: enum: { values: ['Coffee', 'Tea'], message: '{VALUE} is not supported' }
+
+                FINDING ALL OBJECTS
+                    Finds documents.
+
+                    Mongoose casts the filter to match the model's schema before the command is sent. See our query casting tutorial for more information on how Mongoose casts filter.
+
+                    // find all documents
+                    await MyModel.find({});
+
+                    // find all documents named john and at least 18
+                    await MyModel.find({ name: 'john', age: { $gte: 18 } }).exec()
+
+                FIND BY ID
+                    Finds a single document by its _id field. findById(id) is almost* equivalent to findOne({ _id: id }). If you want to query by a document's _id, use findById() instead of findOne().
+
+                FINDONE
+                    Finds one document.
+                    Note: conditions is optional, and if conditions is null or undefined, mongoose will send an empty findOne command to MongoDB, which will return an arbitrary document. If you're querying by _id, use findById() instead.
+
+                    // Find one adventure whose `country` is 'Croatia', otherwise `null`
+                    await Adventure.findOne({ country: 'Croatia' }).exec();
+
+                FINDONEANDDELETE
+                FINDONEANDUPDATE
+
+                
+
+
+
+        DOTENV 
+            Using dotenv is a common way to manage environment variables in Node.js applications. This is especially useful for keeping sensitive information like API keys, database credentials, and other configuration settings out of your source code.
+
+            require('dotenv').config();
+                This will load all the variables from the .env file into process.env.
+
+            You can now access these variables anywhere in your code using process.env. For example:
+                const mongoose = require('mongoose');
+
+                mongoose.connect(process.env.DATABASE_URL, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                })
+                .then(() => console.log('Connected to MongoDB'))
+                .catch((err) => console.error('Failed to connect to MongoDB', err));
+
+                const port = process.env.PORT || 3000;
+                app.listen(port, () => {
+                console.log(`Server running on port ${port}`);
+                });
+
+    ERROR HANDLING EXPRESS
+        Express comes with a built-in error handler that takes care of any errors that might be encountered in the app. This default error-handling middleware function is added at the end of the middleware function stack.
+
+        If you pass an error to next() and you do not handle it in a custom error handler, it will be handled by the built-in error handler; the error will be written to the client with the stack trace. The stack trace is not included in the production environment.
+
+        
+
+
+
+
+
         
 
     

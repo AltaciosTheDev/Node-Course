@@ -12,6 +12,8 @@ const logger = (req,res,next) => {
     next()
 }
 
+
+
 app.get('/', logger,(req,res) => {
    //express takes care of passing the parameters req,res to the middleware in the invoke
    res.send('Home')
