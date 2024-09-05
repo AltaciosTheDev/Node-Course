@@ -1,5 +1,5 @@
 const express = require('express')
-const router = express.Router()
+const router = express.Router()//literally instead of calling express() express.Router() gives us a mini app
 
 const {
   getAllTasks,
@@ -7,7 +7,6 @@ const {
   getTask,
   updateTask,
   deleteTask,
-  editTask,
 } = require('../controllers/tasks')
 
 router.route('/').get(getAllTasks).post(createTask)

@@ -1451,10 +1451,12 @@ SECTION 6: TASK MANAGER API
         1)Setup and connect to cloud database to persist data
         2)Learn CRUD operations on data
         
-    WHY /API CONVENTION?
-        Separation of concerns: Helps differentiate between routes that serve the web application pages, assets like images and tyles and routes that serve the API.
+    WHY /API/V1 CONVENTION?
+        Separation of concerns: 
+            Helps differentiate between routes that serve the web application pages, assets like images and Styles and routes that serve the API.
 
-        Clarity: Provides clear indication to devs and users that the route is related to the api and can tell that it is meant to return data, not a web page. 
+        Clarity: 
+            Provides clear indication to devs and users that the route is related to the api and can tell that it is meant to return data, not a web page. 
 
         EXAMPLE
             domain/api/version/endpoint
@@ -1474,11 +1476,17 @@ SECTION 6: TASK MANAGER API
             Route paths
             Resources
 
+    TRY - CATCH
+        Crucial tools for handling errors when working with async operations such as: fetching data from api, reading files, interacting with database.
+
+        WHY?
+            Unhandled async errors might lead to crashes in the application or leave an unpredictable state. 
+
     MONGO-DB 
         1)NoSQL, NON Relational DB
         2)Store JSON - does not care how data relates
         3)collections instead of tables
-        4)documents instead of rows
+        4)documents instead of rows(single object)
         5)easy to get started
         6)free cloud hosting - atlas
 
@@ -1495,7 +1503,6 @@ SECTION 6: TASK MANAGER API
                 Focus on Development: 
                     You can concentrate on building applications while Atlas handles database management.
 
-
         INITIAL SETUP
             1)create account
             2)set cluster
@@ -1504,6 +1511,10 @@ SECTION 6: TASK MANAGER API
             5)set network permission
             6)create collection
             7)create documents 
+
+        SCHEMA IN MONGO 
+            Dynamic
+                Documents in a same collection don't need to have the same structure schema.
 
         MONGOOSE
             Mongoose is an Object Data Modeling (ODM) library for MongoDB and Node.js. 
@@ -1526,7 +1537,15 @@ SECTION 6: TASK MANAGER API
                 Community and Ecosystem:
                     Mongoose has a large community and a mature ecosystem, with extensive documentation and third-party packages, which means you'll have good support when working on projects.
             
+            ORDER OF CONNECTION 
+                Makes no sense to connect to the server and then to connect to the database.
+
+                Should be:
+                    1)connect to db
+                    2)only then, connect to server
+
             SCHEMA
+                The configuration object for a Mongoose model
                 Everything in Mongoose starts with a Schema. 
                 Each schema maps to a MongoDB collection and defines the shape of the documents within that collection.
 
@@ -1567,22 +1586,71 @@ SECTION 6: TASK MANAGER API
                     EXAMPLE
                         await Tank.create({ size: 'small' });
 
-                VALIDATION 
+
+            SCHEMATYPES
+                 A SchemaType is then a configuration object for an individual property. 
+
+                WHAT DOES IT HANDLE
+                    SchemaTypes handle definition of path defaults, validation, getters, setters, field selection defaults for queries, and other general characteristics for Mongoose document properties.
+
+                MOST SCHEMA TYPES
+                    required: 
+                        boolean or function, if true adds a required validator for this property
+                    default: 
+                        Any or function, sets a default value for the path. If the value is a function, the return value of the function is used as the default.
+                    select: 
+                        boolean, specifies default projections for queries
+                    validate:
+                        function, adds a validator function for this property
+                    get: 
+                        function, defines a custom getter for this property using Object.defineProperty().
+                    set: 
+                        function, defines a custom setter for this property using Object.defineProperty().
+                    alias: 
+                        string, mongoose >= 4.10.0 only. Defines a virtual with the given name that gets/sets this path.
+                    immutable: 
+                        boolean, defines path as immutable. Mongoose prevents you from changing immutable paths unless the parent document has isNew: true.
+                    transform: 
+                        function, Mongoose calls this function when you call Document#toJSON() function, including when you JSON.stringify() a document.
+
+                VALIDATIOS
                     At the moment the schema allows empty properties and empty objects. 
 
                     Validation is defined in the SchemaType
                     Validation is middleware. Mongoose registers validation as a pre('save') hook on every schema by default.
 
-                    Custom Error Messages
-                        You can configure the error message for individual validators in your schema. There are two equivalent ways to set the validator error message:
+                    REQUIRED
+                        Validation in the schema that states that a property can't be empty. 
 
-                        Array syntax: min: [6, 'Must be at least 6, got {VALUE}']
-                        Object syntax: enum: { values: ['Coffee', 'Tea'], message: '{VALUE} is not supported' }
+                        SYNTAX
+                            property: {
+                                type: String,
+                                required: [true, 'custom Error Message To Show']
+                            }
+
+                    TRIM
+                        Removes empty spaces from a value in a specific property 
+
+                        SYNTAX
+                            property: {
+                                type: String,
+                                trim: true
+                            }
+
+                    MIN - MAX PROPERTIES
+                        Allows to specify the min and max values allowed for a property.
+
+                        SYNTAX
+                            property: {
+                                type: String,
+                                maxlength: [20, "custom error message"] 
+                            }
+
 
                 FINDING ALL OBJECTS
                     Finds documents.
 
-                    Mongoose casts the filter to match the model's schema before the command is sent. See our query casting tutorial for more information on how Mongoose casts filter.
+                    Mongoose casts the filter to match the model's schema before the command is sent. 
 
                     // find all documents
                     await MyModel.find({});
@@ -1603,35 +1671,61 @@ SECTION 6: TASK MANAGER API
                 FINDONEANDDELETE
                 FINDONEANDUPDATE
 
-                
+    DOTENV 
+        Using dotenv is a common way to manage environment variables in Node.js applications. This is especially useful for keeping sensitive information like API keys, database credentials, and other configuration settings out of your source code.
 
+        require('dotenv').config();
+            This will load all the variables from the .env file into process.env.
 
+        You can now access these variables anywhere in your code using process.env. For example:
+            const mongoose = require('mongoose');
 
-        DOTENV 
-            Using dotenv is a common way to manage environment variables in Node.js applications. This is especially useful for keeping sensitive information like API keys, database credentials, and other configuration settings out of your source code.
+            mongoose.connect(process.env.DATABASE_URL, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            })
+            .then(() => console.log('Connected to MongoDB'))
+            .catch((err) => console.error('Failed to connect to MongoDB', err));
 
-            require('dotenv').config();
-                This will load all the variables from the .env file into process.env.
-
-            You can now access these variables anywhere in your code using process.env. For example:
-                const mongoose = require('mongoose');
-
-                mongoose.connect(process.env.DATABASE_URL, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-                })
-                .then(() => console.log('Connected to MongoDB'))
-                .catch((err) => console.error('Failed to connect to MongoDB', err));
-
-                const port = process.env.PORT || 3000;
-                app.listen(port, () => {
-                console.log(`Server running on port ${port}`);
-                });
+            const port = process.env.PORT || 3000;
+            app.listen(port, () => {
+            console.log(`Server running on port ${port}`);
+            });
 
     ERROR HANDLING EXPRESS
-        Express comes with a built-in error handler that takes care of any errors that might be encountered in the app. This default error-handling middleware function is added at the end of the middleware function stack.
+        Express comes with a built-in error handler that takes care of any errors that might be encountered in the app. 
+        This default error-handling middleware function is added at the end of the middleware function stack.
 
         If you pass an error to next() and you do not handle it in a custom error handler, it will be handled by the built-in error handler; the error will be written to the client with the stack trace. The stack trace is not included in the production environment.
+
+    THROW
+        1)Generates an expection
+        2)Halts the curren functions
+        3)Handles control to the nearest catch(handles exceptions)
+
+    SUMMARY
+        FOLDERS NEEDED IN STRUCTURE
+            1)db
+                1)connect
+            2)routes
+                1)specific routers
+            3)controllers
+                1)specific controllers
+            4)models
+                1)specific models
+            5)middleware
+                1)not found
+                2)error handling 
+                3)async
+            6)errors
+                custom error
+
+
+SECTION 7: STORE API 
+    
+
+
+    
 
         
 

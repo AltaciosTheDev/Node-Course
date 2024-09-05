@@ -1,6 +1,6 @@
-const express = require('express');
-const app = express();
-const tasks = require('./routes/tasks');
+const express = require('express'); //importing function 
+const app = express(); //executing function that returns express instance 
+const tasks = require('./routes/tasks'); //importing routes
 const connectDB = require('./db/connect');
 require('dotenv').config();
 const notFound = require('./middleware/not-found');
