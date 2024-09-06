@@ -38,7 +38,6 @@ const start = async() => {
     }
     catch(err){
         console.log(err)
-        process.exit(1); // Exit the process with an error code
     }
         
 }
