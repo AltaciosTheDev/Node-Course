@@ -1,13 +1,14 @@
 require('dotenv').config() //will load variables in .env file to the process.env object in the system 
-const errorHandlerMiddleware = require('./middleware/error-handler')
-const notFound = require('./middleware/not-found')
-const connectDB = require('./db/connect')
-const productsRouter = require('./routes/products')
-//async errors 
-require('express-async-errors') // 
+require('express-async-errors') // needs to wrap the async route handlers before they are defined. 
 
 const express = require('express')
 const app = express()
+
+const connectDB = require('./db/connect')
+const productsRouter = require('./routes/products')
+
+const notFound = require('./middleware/not-found')
+const errorHandlerMiddleware = require('./middleware/error-handler')
 
 //default middleware
 app.use(express.json())
