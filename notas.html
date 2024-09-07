@@ -1160,7 +1160,8 @@ SECTION 4: EXPRESS
             req.params: { "userId": "34", "bookId": "8989" }
 
     QUERY STRING PARAMS
-         They are used to filter, sort, or provide additional options for a request. Multiple query parameters can be separated by an ampersand (&).
+         They are used to filter, sort, customize or provide additional options for a request. 
+         Multiple query parameters can be separated by an ampersand (&).
          
          EXAMPLE SERVER ENDPOINT
             pp.get('/search', (req, res) => {
@@ -1722,7 +1723,177 @@ SECTION 6: TASK MANAGER API
 
 
 SECTION 7: STORE API 
+    DEFINED MODEL
+        enum
+
+    POPULATED DB 
+        promises
+        process.exit()
+
+    BASIC FIND
+        Model.find({key: value})
+
+    QUERY PARAMS
+        Using req.query obj as the options object to find in the db.
+            const products = await Product.find(req.query) //empty object makes no difference 
+
+    MONGOOSE V6 UPDATE
+        Mongoose will filter out properties that are not in the schema. 
+        Previously used to return an empty [], now it just filters the properties out. 
+
+    SCHEMA VS NON SCHEMA
+        Mongoose gives a pre determined schema to the collection, enforcing the schema to be respected, and b/c of this it ignores properties that are not in the schema.
+
+    REFACTOR TO QUERY OBJECT
+        Way of working in which we avoid a property passed as a query param that is not included in our Schema that will mess up our async op.
+        Done with:
+            featured
+            company 
+            name
+
+    REGEX
+        Using a string pattern to search everything that may include tha search 
+
+    SORTING DATA
+        Is how to ensure your query results come back in the desired order
+
+        HOW IS THE SORT PASSED THROUGH THE CLIENTS REQUEST?  
+            As a "sort" query param
+
+            EXAMPLE REQUEST
+                GET /api/items?sort=price&order=asc
+
+            EXAMPLE API ROUTE
+                app.get('/api/items', (req, res) => {
+                    const sortField = req.params.sort
+                    cosnt sortOrder = req.params.order === 'desc' ? -1 : 1
+
+                    Item.find().sort({[sortFIeld]:sortORder})
+                        .then(items => res.json(items))
+                        .catch(err => res.status(500)).json({error: 'something went wrong'})
+                })
+
+        IN THE BROWSER URL 
+            SYNTAX
+                url?sort=queryparam
+            REVERSE SORT SYNTAX
+                url?sort=queryparam
+            SEVERAL SORT FILTERS AT A TIME
+                url?sort=queryparam,anotherparam
+
+        HOW DOES IT WORK
+            By chaining to the promise that the original find method of the model returns. 
+
+        SIMPLE MONOGOOSE EXAMPLE
+            await Person.find({}).sort({age: -1})
+            awair Product.find({}).sort('-name price')
+
+        SORTING MULTIPLE FIELDS 
+            The order of the keys determines what key MongoDB server sorts by first. 
+            
+            EXAMPLE
+                await Person.find().sort({age:1, weight: -1})
+
+        LAZY EVALUATION
+            Computation of a value, is deferred until the result is actually needed. 
+
+            QUERY OBJECT CREATION
+                Product.find(queryObject) just describes what you want to receive from the database, but does not run the query.
+                It lets you refine the query before actually runinng it by adding further modifiers. 
+            CHAINING MODIFIERS
+                Every method added further refines the query object that will eventually run to the database.
+            QUERY EXECUTION
+                finally mongoose takes the query object and executes it against a database
+                sends the query to the database 
+                retrieves the result and returns them
+
+            BENEFITS
+                flexibility
+                performance
+                readability
+
+    SELECT OPTION
+        Specifies which documents to include or exclude.
+
+        STRING SYNTAX
+             -: will flag path as excluded
+            "": when a path does not have a prefix, it is included.
+            + :forces incl;usion of the pat.
+
+        HOW TO TELL USER IN API DOCS
+            It is up to us to choose how we call the field that the user will use to select the properties to recieve back.
+
+        EXAMPLE
+            if(fields){
+                let fieldsList = fields.split(',').join(' ')
+                result = result.select(fieldsList)
+            }
+
+    SKIP AND LIMIT 
+        SKIP(usuallty called offset)
+            number of records to skip before the next stage
+
+            SYNTAX
+                aggregate.skip(10)
+
+        LIMIT
+            maximum number of records to return
+
+            SYNTAX
+                aggregate.limit(10);
+
+    PAGINATION
+        Usually done by combining skip and limit
+
+        EXAMPLE
+            const page = Number(req.query.page) || 1 // if no page requested, duh it is one. 
+            const limit = Number(req.query.limit) || 10 // normally default.
+            const skip = (page - 1) * limit 
+            result = result.skip(skip).limit(limit)
+
+    NUMERIC FILTER
+        PURPOSES
+            Let the user find a product based on a numeric filter on the price property 
+
+        HOW MONGOOSE HANDLES IT
+            Every time you want to filter based on a value, like a logical expression, you would be best to use a regex.    
+
+        EXAMPLE OF API TO MIMIC
+            numericFilters = <,<=,=,>,>= for the properties => created_at_i, points, num_comments 
+
+        Step-by-Step Execution:
+            Replace Operators:
+                "price>100,rating>=4" becomes "price-$gt-100,rating-$gte-4".
+            Split into Filters:
+                filters becomes ["price-$gt-100", "rating-$gte-4"].
+            Processing Each Filter:
+                For "price-$gt-100":
+                    field = "price", operator = "$gt", value = "100".
+                    Since "price" is in options, queryObject["price"] = { "$gt": 100 }.
+                For "rating-$gte-4":
+                    field = "rating", operator = "$gte", value = "4".
+                    Since "rating" is in options, queryObject["rating"] = { "$gte": 4 }.
+            Final queryObject:
+                {
+                    price: { $gt: 100 },
+                    rating: { $gte: 4 }
+                }
+
+
+
     
+            
+                    
+
+        
+
+
+
+        
+        
+        
+        
+        
 
 
     
