@@ -1,0 +1,1 @@
+console.log('running 05-jwt-token with nodemon')
