@@ -1,7 +1,6 @@
 class CustomAPIError extends Error{
-    constructor(statusCode, message){
-        super(message),
-        this.statusCode = statusCode
+    constructor(message){
+        super(message)
     }
 }
 
