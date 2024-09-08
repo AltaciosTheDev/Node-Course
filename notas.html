@@ -1880,6 +1880,103 @@ SECTION 7: STORE API
                 }
 
 
+SECTION 8: JWT - BASICS
+    WHAT TO LEARN:
+        1)jwt basics
+        2)importance of authentication 
+        3)how to manage server logic for authorization 
+
+    BASIC IDEA
+        If token is present in request, user can access specific info.
+
+    BASIC PROGRAM STRUCTURE
+        app
+        routes/router
+        controllers
+        middleware
+        errors 
+        no db no model no connect
+
+    VALIDATE USERNAME AND PASSWORD
+        HOW?
+            1)check request body for username and password
+            2)if data exists in db create jwt, if not error reponse 
+            3)send data back to front end
+        
+    JWT OVERVIEW
+        TRADITIONAL PROCESS(PUBLIC)
+            HTTP MESSAGES   => REQUEST  =>  NODE/EXPRESS    =>  RESPONSE    => CLIENT
+
+        JWT ACCESS(PRIVATE)
+            LOGIN REQUEST   => NODE/EXPRESS =>  RESPONSE + SIGNED JWT    => CLIENT  => HTTP REQUEST + SIGNED JWT   =>  NODE/EXPRESS    =>  RESPONSE    => CLIENT
+        
+        WHY USE JWT
+            1)Security feature(it means its the same token sent to the front end)
+            2)server does not remember every single request sent
+            3)size is smaller than with other tokens
+
+
+        JWT STRUCTURE
+            header
+            payload
+            signature
+
+            HEADER
+                type of the token
+                    jwt
+                algorithm used
+                    hmac
+                    sha256
+                    rsa
+            PAYLOAD
+                information from the client 
+            SIGNATURE
+            
+        JSONWEBTOKEN PACKAGE
+            SETUP
+                const jwt = require('jsonwebtoken');
+                const token = jwt.sign({username},process.env.JWT_SECRET, {expiresIn:'30d'})
+
+        HOW TO INCLUDE TOKEN FROM THE FRONT END REQUEST
+            HEADER
+                Authorization: Bearer <token> 
+
+        ANALYZE REQUESTS IN NETWORK
+            LOGIN
+                payload(client info sent to backend)
+                response(backend to client)
+            DASHBOARD
+                header
+                    Authorization: Bearer <token> 
+                    response(backend to client)
+
+        req.headers
+            Gives back all the headers sent by the client's http request
+
+        VERIFY TOKEN IN ROUTE 
+            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+        AUTH MIDDLEWARE SETUP
+            If we keep going in this same way we will need to provide the authentication code to ever route, this is not efficient and thus calls for the use of another middleware.
+
+        
+
+
+        
+
+        
+            
+
+                    
+            
+            
+            
+
+
+        
+
+
+
 
     
             
