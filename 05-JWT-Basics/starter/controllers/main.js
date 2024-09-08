@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-const CustomAPIError = require('../errors/custom-error')
+const {BadRequestError} = require('../errors/index') 
 
 const login = async (req, res) => {
     const {username, password} = req.body 
 
     //if username or password not included throw error, and errorHanlderMiddleware will handle it.
     if(!username || !password){
-        throw new CustomAPIError(400, 'Please provide email and password')
+        throw new BadRequestError('Please provide email and password')
     }
     const id = new Date().getDate() //gets the day, which in english it is usually called the date
 
