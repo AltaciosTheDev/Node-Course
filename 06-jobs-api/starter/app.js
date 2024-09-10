@@ -8,11 +8,11 @@ const app = express();
 const notFoundMiddleware = require('./middleware/not-found');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 
-app.use(express.json());
+app.use(express.json()); //without this, req.body not accesible. 
 // extra packages
 
 // routes
-app.get('/', (req, res) => {
+app.get('/api/v1', (req, res) => {
   res.send('jobs api');
 });
 
