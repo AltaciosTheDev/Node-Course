@@ -20,8 +20,8 @@ app.use(express.json()); //without this, req.body not accesible.
 // extra packages
 
 // routes
-app.get('/api/v1/auth', authRouter)
-app.get('/api/v1/jobs', jobsRouter)
+app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/jobs', jobsRouter)
 
 //custom middleware
 app.use(notFoundMiddleware);
