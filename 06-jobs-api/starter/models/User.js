@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -23,10 +24,21 @@ const UserSchema = new mongoose.Schema({
     }
 })
 
+//encrypts the password here
 UserSchema.pre('save', async function (next){
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
     //next() Mongoose 5> if you use a function that returns promise, no need for next.
 })
+ 
+//instance method to get documents name
+//UserSchema.methods.getName = function () { 
+  //  return this.name
+//}
+
+//instance method for generating token?
+UserSchema.methods.createJWT = function () {
+    return jwt.sign({userId:this._id, name: this.name}, 'jwtSecret', {expiresIn: '30d'})
+}
 
 module.exports = mongoose.model('User', UserSchema) 

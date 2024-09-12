@@ -1948,6 +1948,34 @@ SECTION 8: JWT - BASICS
                 const jwt = require('jsonwebtoken');
                 const token = jwt.sign({username},process.env.JWT_SECRET, {expiresIn:'30d'})
 
+            jwt.sign() accepts 3 parameters:
+                Payload
+                    Data to include in the JWT.
+                    This can be any information you want to store or transmit securely, such as user ID, email, or roles. 
+                Secret or private key
+                    String used to sign the token. 
+                    On the server side you use this key to both sign the token and verify its authenticity later.
+                Options(optional)
+                    Set additional metadata for the token, such as its expiration time, issuer, audience, and algorithm to use for signing.
+                        expiresIn
+                        issuer
+                        audience
+                        algorithm
+
+                WHY THE PAYLOAD
+                    Provide the back end with useful verifiable information without the need to query the database or another system for each request.
+
+                    Stateless auth
+                        The back end retains ntohing of the request, the payload allows for authentication without querying a database system.
+
+                    Efficiency
+                        Avoid repeated database lookups.
+
+                HOW DOES THE BACK END USE THE PAYLOAD
+                    1)Verifying the identity: checking id
+                    2)Authorization: checking role
+                    3)Expiration Handling: expiration 
+
         HOW TO INCLUDE TOKEN FROM THE FRONT END REQUEST
             HEADER
                 Authorization: Bearer <token> 
@@ -2109,6 +2137,12 @@ WEDNESDAY
                     Schema.pre/post('event', callbackFunction)
 
         CREATE TOKEN 
+            .Method  on a model allows to create custom methods to use on the models
+            WHERE CAN IT BE CREATED
+                1)controller
+                2)model instance methods
+
+            
 
         SEND RESPONSE WITH TOKEN
             
