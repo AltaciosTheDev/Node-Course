@@ -32,6 +32,17 @@ FUN FACTS
     Express provides the req and res as arguments automatically when using MVC archiquecture 
     If you invoke a function in a module, when you require that in another module, it will run the function.
 
+LIBRARIES USED:
+    1)dotenv
+    2)nodemon
+    3)express
+    4)mongoose
+    5)morgan
+    6)express aysnc errors
+    7)http status codes
+    8)json web token 
+    9)joi(not used but serves validation purposes)
+
 SECTION 2: INSTALLING NODE --------------------------------------------------------
 
 DIFFERENCES WITH NODEJS VS BROWSER JS
@@ -1959,8 +1970,155 @@ SECTION 8: JWT - BASICS
         AUTH MIDDLEWARE SETUP
             If we keep going in this same way we will need to provide the authentication code to ever route, this is not efficient and thus calls for the use of another middleware.
 
+        HTTP-STATUS-CODES
+            The http-status-codes library is a Node.js package that provides a set of constants representing standard HTTP status codes and their descriptions. It simplifies working with HTTP status codes in your application by providing a more readable and maintainable way to reference them, rather than using numeric literals directly.
+
+            INSTALL
+                npm install http-status-codes
+
+            EXAMPLE
+                const { StatusCodes, ReasonPhrases } = require('http-status-codes');
+
+                app.get('/', (req, res) => {
+                    res.status(StatusCodes.OK).send(ReasonPhrases.OK); // Send "200 OK"
+                });
+
+            BENEFITS
+                Readability: 
+                    Using named constants like StatusCodes.OK or StatusCodes.BAD_REQUEST improves code readability and reduces the likelihood of errors compared to using raw numeric codes like 200 or 400.
+                Maintainability: 
+                    The code becomes easier to maintain since you don't have to remember what each numeric status code represents.
+                Standardization: 
+                    The library helps ensure you are using the correct status codes and reason phrases as defined by the HTTP specification.
+
+        
+SECTION 9: JOBS API
+MONDAY
+    WHAT TO LEARN
+        1)combine auth knowledge with CRUD
+        2)Feautres
+            a)log in
+            b)register
+            c)job search 
+            d)deploy app to heroku 
+            e)nice documentation (swagger ui)
+
+    SETUP
+        1)packages
+        2)folders
+        3).env
+        4)connectDB
+        5)errors
+        6)middleware
+    
+    CONTROLLERS
+        1)auth
+            a)login
+            b)register
+        2)jobs
+            a)get all jobs
+    
+    ROUTES
+        1)auth
+        2)jobs
+
+    CONNECT DB 
+        just set up variables and url
+
+    USER SCHEMA : {
+        name: {
+        
+        },
+        email: {
+            match: [regex, error message]
+        },  
+        password: {
+            
+        }
+    }
+
+    REGISTER ROUTE FUNCTIONALITIES
+        VALIDATE WITH MONGOOSE
+            name
+            email
+            password
+
+            EXAMPLE IN CONTROLLER
+                const {name, email, password} = req.body
+                if(!name || !email || !password) {
+                    throw new BadRequestError('Please provide name, email, password') //our own logic errors take precedence over the default ones from mongoose
+                }
+
+TUESDAY: SICK
+
+WEDNESDAY
+    CONTINUE REGISTER USER FUNCITONALITY
+        PROBLEM
+            If someonw hacks my database, they'll get access to everyones password...
+        SOLUTION 
+            Encryption.
+    
+        HASH PASSWORD WITH BCRYPT
+            Hasing means generating random bytes and combining it with the password through a math algorithm that maps data of any size to a string of fixed size. 
+            If anything changes, the whole string changes.
+
+            HASHING VS ENCRYPTION
+                Hashing can't be reverted back unlike encryption.
+
+            SALT
+                Random string added to the password before hashing. 
+                Ensure that if 1 users have same password, hashes will be different.
+
+            HOW IT WORKS
+                Generate salt
+                    Unique string added to passwords to ensure uniqueness.
+
+                    await bcrypt.genSalt(round)
+                Hash pass and salt
+                    Pass and salt are combined, and run through the hash function
+                Store and hash together
+                    The system will use both the hash and salt to verify passwords in the future
+
+                    await bcrypt.hash(password, salt)
+                Verification
+                    Bcrypt takes the salt from the stored hash, combines it with the provied password, runs the algorithm.
+
+
+            WHERE TO HASH
+                1)can be done in controller
+                2)can be done in mongoose model middlware 
+
+            MONGOOSE MIDDLEWARE 
+                Also called pre and post hooks, are functions executed during specific stages in a Mongoose model's lifecycle. 
+
+                PURPOSE
+                    Allow to perform operations before or after certain operations such as:
+                        1)saving
+                        2)deleting
+                        3)querying
+                
+                COMMON USES
+                    Add login to actions like:
+                        1)validating data
+                        2)hashing passwords
+                        3)modifying documents before saving 
+
+                THIS
+                    When using pre middleware, "this" refers to the document itself or the query
+                SYNTAX
+                    Schema.pre/post('event', callbackFunction)
+
+        CREATE TOKEN 
+
+        SEND RESPONSE WITH TOKEN
+            
+        
+                        
         
 
+    
+        
+    
 
         
 
