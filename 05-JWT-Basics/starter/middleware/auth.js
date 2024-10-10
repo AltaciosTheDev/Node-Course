@@ -1,4 +1,4 @@
-const CustomAPIError = require('../errors/custom-error')
+const {UnauthenticatedError} = require('../errors') //if you just specify the folder, it will get the index.js
 const jwt = require('jsonwebtoken')
 
 const authenticationMiddleware = async (req, res, next) => {
@@ -8,7 +8,7 @@ const authenticationMiddleware = async (req, res, next) => {
 
     //6)validate that auth header is correct format
     if(!authHeader || !authHeader.startsWith('Bearer ')) {
-        throw new CustomAPIError('No token or incorrect token format', 401)
+        throw new UnauthenticatedError('No token or incorrect token format')
     }
     const token = authHeader.split(' ')[1]
 
@@ -20,7 +20,7 @@ const authenticationMiddleware = async (req, res, next) => {
         next()
     }
     catch(err) {
-        throw new CustomAPIError('Not authorized to access this route', 401)
+        throw new UnauthenticatedError('Not authorized to access this route')
     }
 }
 

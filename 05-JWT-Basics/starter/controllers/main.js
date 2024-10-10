@@ -1,5 +1,5 @@
 require('dotenv').config()
-const CustomAPIError = require('../errors/custom-error')
+const {BadRequest} = require('../errors')
 const jwt = require('jsonwebtoken')
 
 //1)send credentials from front to back 
@@ -9,7 +9,7 @@ const login = async ( req, res) => {
     console.log(username, password)
     //2)back validates if username and password are sent
     if(!username || !password){
-        throw new CustomAPIError('please provide email and password', 400)
+        throw new BadRequest('please provide email and password')
     }
     const id = new Date().getDate()
     //3)back creates token with user payload, signs it and sends back
