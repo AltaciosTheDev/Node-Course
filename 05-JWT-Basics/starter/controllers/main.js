@@ -21,26 +21,9 @@ const login = async ( req, res) => {
 
 
 const dashboard = async (req, res) => {
-    //5)check auth header
-    const authHeader = req.headers.authorization
-
-    //6)validate that auth header is correct format
-    if(!authHeader || !authHeader.startsWith('Bearer ')) {
-        throw new CustomAPIError('No token or incorrect token format', 401)
-    }
-    const token = authHeader.split(' ')[1]
-    
-
-    //7)decode token to verify it is the correct one
-    try{//because if decode wrong, will throw error. 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const luckyNumber = Math.floor(Math.random()*100)
-        console.log(decoded)
-        res.status(200).json({msg:`Hello, ${decoded.username}`, secret: `Here is your authroizied data, your lucky number is ${luckyNumber}`})
-    }
-    catch(err) {
-        throw new CustomAPIError('Not authorized to access this route', 401)
-    }
+    console.log(req.user)
+    const luckyNumber = Math.floor(Math.random()*100)
+    res.status(200).json({msg:`Hello, ${req.user.username}`, secret: `Here is your authroizied data, your lucky number is ${luckyNumber}`})
 }
 
 module.exports = {
