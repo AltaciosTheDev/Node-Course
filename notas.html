@@ -1734,19 +1734,70 @@ SECTION 6: TASK MANAGER API
 
 
 SECTION 7: STORE API 
+        OBJECTIVE
+            Offer filtering options to the user
+
+            EXAMPLE
+                algolia.com api 
+
+    EXPRESS ASYNC ERRORS
+        Simplifies error handling in express
+
+        WHY?
+            Normally when errors occur in async handlers in express, the errors are not caught automatically by express's error handling middleware. 
+
+        BAD SOLUTION
+            Wrap every handler in a try / catch 
+
+        HOW EXPRESS ASYNC ERRORS WORKS 
+            auto catches the errors and passes them to express's error handling middleware, without needing to wrap everything in try catch. 
+        
+        THE MAGIC INSIDE
+            wraps all async route handlers. Detecs when a promise is rejected or error thrown the async route handler. 
+            It ensures it is being passed to the handler with has the err parameter. 
+
     DEFINED MODEL
         enum
+
+    .CREATE()
+        Property accepts a single object and an array of objects
 
     POPULATED DB 
         promises
         process.exit()
 
-    BASIC FIND
-        Model.find({key: value})
+    Moddel.find()
+        used to retrieve documents based on the provided query.
+
+        BASIC SYNTAX
+            Model.find(query, [projection], [options], [callback])
+
+        PARAMETERS
+            1)query
+                Defines the conditions for selecting documents based on key value pairs\
+
+                a)basic 
+                    Model.find({name: 'john'})
+                b)query operators mongoDB
+                    Model.find({age: {$gt:18}})
+
+            2)projection
+                Specifies whether to include or exclude from the result. 
+                    Model.find({}, {name: 1, age:1})
+
+            3) options
+                allows you to specify additioinal options to control the query's behavior.
+                limit
+                skip
+                sort
+                lean
 
     QUERY PARAMS
         Using req.query obj as the options object to find in the db.
             const products = await Product.find(req.query) //empty object makes no difference 
+
+        USE? 
+            Can search from the db dynamically with the re.query object
 
     MONGOOSE V6 UPDATE
         Mongoose will filter out properties that are not in the schema. 
@@ -1756,41 +1807,43 @@ SECTION 7: STORE API
         Mongoose gives a pre determined schema to the collection, enforcing the schema to be respected, and b/c of this it ignores properties that are not in the schema.
 
     REFACTOR TO QUERY OBJECT
-        Way of working in which we avoid a property passed as a query param that is not included in our Schema that will mess up our async op.
-        Done with:
-            featured
-            company 
-            name
+        WHY?
+            This will allow us to extract the properties we will need and act based upon which properties we are receiving instead of just being affected by 1 property that will not be of use.
 
-    REGEX
-        Using a string pattern to search everything that may include tha search 
+        COMPANY
+            Same process as with feature
+
+        NAME
+            PROBLEM
+                It will only find the name that matches exactly the same 
+
+            QUERY OPERATORS MONGODB
+                REGEX
+                    Using a string pattern to search everything that may include tha search 
+                $regex
+                    Provides regular expression capabilities for pattern matching strings in queries.
+
+                SYNTAX
+                    { <field>: { $regex: /pattern/, $options: '<options>' } }
+                    { "<field>": { "$regex": "pattern", "$options": "<options>" } }
+                    { <field>: { $regex: /pattern/<options> } }
+
+                This creates a query where:
+                    name is matched using a regular expression specified by $regex: name, which will search for any occurrence of the string provided in the name field.
+                    The $options: 'i' flag tells MongoDB to perform the match in a case-insensitive manner.
 
     SORTING DATA
         Is how to ensure your query results come back in the desired order
 
-        HOW IS THE SORT PASSED THROUGH THE CLIENTS REQUEST?  
-            As a "sort" query param
+        MONGOOSE EXAMPLES
+            // sort by "field" ascending and "test" descending
+            query.sort({ field: 'asc', test: -1 });
 
-            EXAMPLE REQUEST
-                GET /api/items?sort=price&order=asc
+            // equivalent
+            query.sort('field -test');
 
-            EXAMPLE API ROUTE
-                app.get('/api/items', (req, res) => {
-                    const sortField = req.params.sort
-                    cosnt sortOrder = req.params.order === 'desc' ? -1 : 1
-
-                    Item.find().sort({[sortFIeld]:sortORder})
-                        .then(items => res.json(items))
-                        .catch(err => res.status(500)).json({error: 'something went wrong'})
-                })
-
-        IN THE BROWSER URL 
-            SYNTAX
-                url?sort=queryparam
-            REVERSE SORT SYNTAX
-                url?sort=queryparam
-            SEVERAL SORT FILTERS AT A TIME
-                url?sort=queryparam,anotherparam
+            // also possible is to use a array with array key-value pairs
+            query.sort([['field', 'asc']]);
 
         HOW DOES IT WORK
             By chaining to the promise that the original find method of the model returns. 
@@ -1822,6 +1875,7 @@ SECTION 7: STORE API
                 flexibility
                 performance
                 readability
+
 
     SELECT OPTION
         Specifies which documents to include or exclude.
@@ -1900,32 +1954,22 @@ SECTION 8: JWT - BASICS
     BASIC IDEA
         If token is present in request, user can access specific info.
 
-    BASIC PROGRAM STRUCTURE
-        app
-        routes/router
-        controllers
-        middleware
-        errors 
-        no db no model no connect
-
     VALIDATE USERNAME AND PASSWORD
-        HOW?
-            1)check request body for username and password
-            2)if data exists in db create jwt, if not error reponse 
-            3)send data back to front end
+        1)check request body for username and password
+        2)if data exists in db create jwt, if not error reponse 
+        3)send data back to front end
+
+        WAYS TO VALIDATE BODY
+            1)mongoose 
+            2)Joi
+            3)check in controller
+                    
         
     JWT OVERVIEW
-        TRADITIONAL PROCESS(PUBLIC)
-            HTTP MESSAGES   => REQUEST  =>  NODE/EXPRESS    =>  RESPONSE    => CLIENT
-
-        JWT ACCESS(PRIVATE)
-            LOGIN REQUEST   => NODE/EXPRESS =>  RESPONSE + SIGNED JWT    => CLIENT  => HTTP REQUEST + SIGNED JWT   =>  NODE/EXPRESS    =>  RESPONSE    => CLIENT
-        
         WHY USE JWT
             1)Security feature(it means its the same token sent to the front end)
             2)server does not remember every single request sent
             3)size is smaller than with other tokens
-
 
         JWT STRUCTURE
             header
@@ -1942,6 +1986,7 @@ SECTION 8: JWT - BASICS
             PAYLOAD
                 information from the client 
             SIGNATURE
+                Special key that only the back end knows and sends back, if the backend does not receive the token with the exact signature then it will not work. 
             
         JSONWEBTOKEN PACKAGE
             SETUP
@@ -1951,7 +1996,10 @@ SECTION 8: JWT - BASICS
             jwt.sign() accepts 3 parameters:
                 Payload
                     Data to include in the JWT.
-                    This can be any information you want to store or transmit securely, such as user ID, email, or roles. 
+                    This can be any information you want to store or transmit securely, such as user:
+                        ID
+                        email
+                        roles 
                 Secret or private key
                     String used to sign the token. 
                     On the server side you use this key to both sign the token and verify its authenticity later.
@@ -1961,6 +2009,12 @@ SECTION 8: JWT - BASICS
                         issuer
                         audience
                         algorithm
+
+                EXAMPLES OF HOW TO CREATE TOKEN 
+                    jwt.sign({data: 'foobar'}, 'secret', { expiresIn: 60 * 60 });
+
+                    //or even better:
+                        jwt.sign({data: 'foobar'}, 'secret', { expiresIn: '1h' });
 
                 WHY THE PAYLOAD
                     Provide the back end with useful verifiable information without the need to query the database or another system for each request.
@@ -1994,9 +2048,22 @@ SECTION 8: JWT - BASICS
 
         VERIFY TOKEN IN ROUTE 
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
+            This is an async process, will throw error if token from front end is incorrect. 
 
         AUTH MIDDLEWARE SETUP
-            If we keep going in this same way we will need to provide the authentication code to ever route, this is not efficient and thus calls for the use of another middleware.
+            Every single protected route will need the auth logic so this will become repetitive. To tackle this issue, lets refactor to a middleware this code. 
+
+            EXAMPLE OF USING AUTH LOGIC AS MIDDLEWARE
+                ROUTE
+                    router.route('/dashboard').get(authenticationMiddleware, dashboard)
+                
+                AUTH MIDDLEWARE
+                    const authenticationMiddleware = async (req, res, next) => {
+                    //next here b/c we are not using another 3rd party middleware, we need to pass control to the next middleware.
+                        console.log(req.headers.authorization)
+                        next()
+                    }
+                    module.exports = authenticationMiddleware
 
         HTTP-STATUS-CODES
             The http-status-codes library is a Node.js package that provides a set of constants representing standard HTTP status codes and their descriptions. It simplifies working with HTTP status codes in your application by providing a more readable and maintainable way to reference them, rather than using numeric literals directly.

@@ -4,7 +4,7 @@ const asyncWrapper = (fn) => {
             await fn(req,res,next)
         } 
         catch(error){
-            next(error)
+            next(error) //wrap everything in try catch and manually forward to express error handler()
         }
     }
 }
