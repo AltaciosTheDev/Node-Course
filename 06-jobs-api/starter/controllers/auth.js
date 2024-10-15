@@ -28,6 +28,8 @@ const login = async ( req, res ) => {
         throw new UnauthenticatedError('No user with the email provided is registered in the database')
     }
 
+    const isPasswordCorrect = await user.comparePassword(password)
+    
     if(!isPasswordCorrect){
         throw new UnauthenticatedError(`Password for email ${email} is incorrect`)
     }
