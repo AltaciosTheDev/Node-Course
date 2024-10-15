@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
-
+const jwt = require('jsonwebtoken')
 const UserSchema = new mongoose.Schema({
     name:{
         type: String,
@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide name'],
         match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "Please prpovide valid email"],
-        //unique: true
+        unique: false
     },
     password:{
         type: String,
@@ -28,7 +28,14 @@ UserSchema.pre('save', async function(){
     this.password = await bcrypt.hash(this.password, salt) //we already have access to all the req.body, the Create function took care of that. 
 })
 
+UserSchema.methods.getName = function () {
+    return this.name
+}
 
+UserSchema.methods.createJWT = function () {
+    return jwt.sign({userId: this._id, name: this.name}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_LIFETIME})
+
+}
 
 module.exports = mongoose.model('User', UserSchema) //returns user model
 
