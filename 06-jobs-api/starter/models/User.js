@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
 
 const UserSchema = new mongoose.Schema({
     name:{
@@ -19,6 +20,15 @@ const UserSchema = new mongoose.Schema({
         minlength:6
     }
 })
+
+//remember eveything dealing with the db, is going to be async.
+//using normal syntax, this will refer to the document. 
+UserSchema.pre('save', async function(){
+    const salt = await bcrypt.genSalt(10)
+    this.password = await bcrypt.hash(this.password, salt) //we already have access to all the req.body, the Create function took care of that. 
+})
+
+
 
 module.exports = mongoose.model('User', UserSchema) //returns user model
 
