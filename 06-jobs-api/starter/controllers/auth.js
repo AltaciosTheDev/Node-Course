@@ -1,6 +1,7 @@
 const User = require('../models/User')
+const bcrypt = require('bcrypt')
 const {StatusCodes} = require('http-status-codes')
-const {BadRequestError} = require('../errors')
+const {BadRequestError, UnauthenticatedError} = require('../errors')
 
 
 const register = async (req, res) => {
@@ -15,7 +16,25 @@ const register = async (req, res) => {
 }
 
 const login = async ( req, res ) => {
-    res.send('login user')
+    const {email, password} = req.body
+
+    if(!email || !password) {
+        throw new BadRequestError('Please provide email and password')
+    }
+    
+    const user = await User.findOne({email}) //looks up the first 
+
+    if(!user){
+        throw new UnauthenticatedError('No user with the email provided is registered in the database')
+    }
+
+    if(!isPasswordCorrect){
+        throw new UnauthenticatedError(`Password for email ${email} is incorrect`)
+    }
+
+    const token = user.createJWT()
+    res.status(StatusCodes.OK).json({user: {name: user.name}, token}) //code for item found 200
+
 }
 
 module.exports = {
