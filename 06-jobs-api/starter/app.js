@@ -2,6 +2,7 @@ require('dotenv').config();         //load .env variables to process.env global 
 require('express-async-errors');    //to wrap around all controllers and handle async errors 
 const express = require('express'); //import express
 const app = express();              //create express app
+const authMiddleware = require('./middleware/authentication')
 
 //connectDB
 const connectDB = require('./db/connect')
@@ -20,8 +21,8 @@ app.use(express.json()); //if not parsed, will appear undefined due to format
 // extra packages
 
 // routes
-app.use('/api/v1/auth', authRouter)
-app.use('/api/v1/jobs', jobsRouter)
+app.use('/api/v1/auth', authRouter) 
+app.use('/api/v1/jobs', authMiddleware,jobsRouter)//middleware will come before all the authRouter and this will protect all the job routes.
 
 //use custom middleware after routers
 app.use(notFoundMiddleware);
