@@ -1,6 +1,7 @@
 const Job = require('../models/Job')
 const {StatusCodes} = require('http-status-codes')
 const {BadRequestError, NotFoundError} = require('../errors')
+const { find } = require('../models/User')
 
 const getAllJobs = async (req, res) => {
     //can only access your jobs 
@@ -11,7 +12,15 @@ const getAllJobs = async (req, res) => {
 }
 
 const getJob = async (req, res) => {
-    res.send('get jobs')
+    //nested destructuring and renaming of property 
+    const {user:{userId}, params:{id:jobId}} = req
+    const job = await Job.findOne({_id: jobId, createdBy: userId})
+
+    if(!job){
+        throw new NotFoundError(`No job with Id ${jobId} exists in the database.`)
+    }
+
+    res.status(StatusCodes.OK).json({user: userId, job})
 }
 
 const createJob = async (req, res) => {
