@@ -32,11 +32,13 @@ UserSchema.methods.getName = function () {
     return this.name
 }
 
+//if not done this way, would've had to do process twice: register, and login in controller.
+//example of encapsulation so logic stays hidden.
 UserSchema.methods.createJWT = function () {
     return jwt.sign({userId: this._id, name: this.name}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_LIFETIME})
-
 }
 
+//example of encapsulation
 UserSchema.methods.comparePassword = async function (candidatePassword) {
     const isMatch = await bcrypt.compare(candidatePassword, this.password)
     return isMatch 
