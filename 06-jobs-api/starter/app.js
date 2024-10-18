@@ -4,6 +4,12 @@ const express = require('express'); //import express
 const app = express();              //create express app
 const authMiddleware = require('./middleware/authentication')
 
+//extra security packages
+const helmet = require('helmet')
+const cors = require('cors')
+const xss = require('xss-clean')
+const rateLimiter = require('express-rate-limit')
+
 //connectDB
 const connectDB = require('./db/connect')
 
@@ -15,8 +21,15 @@ const jobsRouter = require('./routes/jobs')
 const notFoundMiddleware = require('./middleware/not-found');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 
+//if behind proxy 
+app.set('trust proxy', 1)
+
 //use default middleware 
+app.use(rateLimiter({windowsMs: 15 * 60 * 1000,max: 100}))
 app.use(express.json()); //if not parsed, will appear undefined due to format
+app.use(helmet())
+app.use(cors())
+app.use(xss())
 
 // extra packages
 
