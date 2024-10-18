@@ -14,6 +14,11 @@ let customError = {
   // if (err instanceof CustomAPIError) {
   //   return res.status(err.statusCode).json({ msg: err.message })
   // }
+
+  if(err.name === 'CastError'){
+    customError.msg = `ObjectID provided is not the right length of characters`
+  }
+
   
   if(err.code && err.code == 11000){
     customError.msg = `Duplicate value entered for ${err.errorResponse.keyValue.email} field, please choose another value.`
