@@ -2047,7 +2047,7 @@ SECTION 8: JWT - BASICS
             Gives back all the headers sent by the client's http request
 
         VERIFY TOKEN IN ROUTE 
-            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+            const decoded = jwt.verify(token, process.env.JWT_SECRET) 
             This is an async process, will throw error if token from front end is incorrect. 
 
         AUTH MIDDLEWARE SETUP
@@ -2113,7 +2113,6 @@ THURSDAY
             b)interview
             c)declined
         
-        6)
     SETUP
         1)packages
         2)folders
@@ -2127,32 +2126,39 @@ THURSDAY
             a)login
             b)register
         2)jobs
-            a)get all jobs
+            a)CRUD 
     
     ROUTES
-        1)auth
-        2)jobs
+        1)/auth
+        2)/jobs
 
     CONNECT DB 
         just set up variables and url
 
-    USER SCHEMA : {
-        name: {
-        
-        },
-        email: {
-            match: [regex, error message]
-        },  
-        password: {
-            
-        }
-    }
+    USER MODELS 
+        Whenever setting up models, several things have to be considered:
 
-    REGISTER ROUTE FUNCTIONALITIES
-        VALIDATE WITH MONGOOSE
-            name
-            email
-            password
+        THEORY TO REMEMBER
+            What is a Schema?
+                You can think of a Mongoose schema as the configuration object for a Mongoose model. 
+                
+            What is a Schema Type? 
+                A SchemaType is then a configuration object for an individual property. 
+                A SchemaType says what type a given path should have, whether it has any getters/setters, and what values are valid for that path.
+
+        1)Validations
+            Is defined in the schema type. 
+            Is a middleware defined by a pre save hook on every schema by default. 
+            
+    REGISTER USER 
+        Objectives: 
+            - Validate - name, email, password - with Mongoose(done)
+            - Hash Password (with bcryptjs)(done)
+            - Save User(done)
+            - Generate Token(done)
+            - Send Response with Token(done)
+
+        VALIDATE: NAME EMAIL PASSWORD
 
             EXAMPLE IN CONTROLLER
                 const {name, email, password} = req.body
@@ -2160,50 +2166,53 @@ THURSDAY
                     throw new BadRequestError('Please provide name, email, password') //our own logic errors take precedence over the default ones from mongoose
                 }
 
-TUESDAY: SICK
+            EXAMPLE IN MONGOOSE
+                Include required or any other schemaTypes in those properties. 
 
-WEDNESDAY
-    CONTINUE REGISTER USER FUNCITONALITY
-        PROBLEM
-            If someonw hacks my database, they'll get access to everyones password...
-        SOLUTION 
-            Encryption.
+        HASH PASSWORD 
+            PROBLEM
+                If someone hacks my database, they'll get access to everyones password...
+            SOLUTION 
+                Encryption.
+        
+            HASH PASSWORD WITH BCRYPT
+                Hashing means generating random bytes and combining it with the password through a math algorithm that maps data of any size to a string of fixed size. 
+                If anything changes, the whole string changes.
+
+                HASHING VS ENCRYPTION
+                    Hashing can't be reverted back unlike encryption.
+
+                SALT
+                    Random string added to the password before hashing. 
+                    Ensure that if 1 users have same password, hashes will be different.
+
+                HOW IT WORKS
+                    Generate salt
+                        Unique string added to passwords to ensure uniqueness
+                        await bcrypt.genSalt(round)
+                    Hash pass and salt
+                        Pass and salt are combined, and run through the hash function
+                    Store and hash together
+                        The system will use both the hash and salt to verify passwords in the future
+                        await bcrypt.hash(password, salt)
+                    Verification
+                        Bcrypt takes the salt from the stored hash, combines it with the provied password, runs the algorithm.
     
-        HASH PASSWORD WITH BCRYPT
-            Hasing means generating random bytes and combining it with the password through a math algorithm that maps data of any size to a string of fixed size. 
-            If anything changes, the whole string changes.
+                WHERE TO HASH
+                    1)controller
+                    2)mongoose model middlware 
 
-            HASHING VS ENCRYPTION
-                Hashing can't be reverted back unlike encryption.
-
-            SALT
-                Random string added to the password before hashing. 
-                Ensure that if 1 users have same password, hashes will be different.
-
-            HOW IT WORKS
-                Generate salt
-                    Unique string added to passwords to ensure uniqueness.
-
-                    await bcrypt.genSalt(round)
-                Hash pass and salt
-                    Pass and salt are combined, and run through the hash function
-                Store and hash together
-                    The system will use both the hash and salt to verify passwords in the future
-
-                    await bcrypt.hash(password, salt)
-                Verification
-                    Bcrypt takes the salt from the stored hash, combines it with the provied password, runs the algorithm.
-
-
-            WHERE TO HASH
-                1)can be done in controller
-                2)can be done in mongoose model middlware 
+                MOVING HASH LOGIC TO MONGOOSE MODEL 
+                    UserSchema.pre('save', async function(){
+                        const salt = await bcrypt.genSalt(10)
+                        this.password = await bcrypt.hash(this.password, salt) //we already have access to all the req.body, the Create function took care of that. 
+                    })
 
             MONGOOSE MIDDLEWARE 
                 Also called pre and post hooks, are functions executed during specific stages in a Mongoose model's lifecycle. 
 
                 PURPOSE
-                    Allow to perform operations before or after certain operations such as:
+                    Allows to perform DRY and efficient procedures before or after certain operations such as:
                         1)saving
                         2)deleting
                         3)querying
@@ -2213,22 +2222,379 @@ WEDNESDAY
                         1)validating data
                         2)hashing passwords
                         3)modifying documents before saving 
-
                 THIS
                     When using pre middleware, "this" refers to the document itself or the query
                 SYNTAX
+                    const schema = new Schema(...)
                     Schema.pre/post('event', callbackFunction)
 
-        CREATE TOKEN 
-            .Method  on a model allows to create custom methods to use on the models
-            WHERE CAN IT BE CREATED
-                1)controller
-                2)model instance methods
+                RELATION TO OOP 
+                    Similar to being able to configure your constructor function when creating an object. 
+Monday
+        GENERATE TOKEN
+            IN CONTROLLER 
+                const user = await User.create({...req.body})//req and sendig request to create document is first.
+                const token = jwt.sign({userId: user._id, name: user.name}, process.env.JWT_SECRET, {expiresIn: '30d'})
+
+            AS A MONGOOSE INSTANCE METHOD
+                Are functions defined on mongoose model instances(documents) and can be used to perform operations on those specific documents. 
+
+                WHY USEFUL?
+                    Allow to encapsulate behavior that relates to the data within the document, allowing for organization of code. 
+
+                RELATION TO OOP 
+                    Similar to methods belonging to an object that perform operations based on the objects properties.
+
+                EXAMPLE 
+                    const mongoose = require('mongoose');
+
+                    // Define a schema
+                        const userSchema = new mongoose.Schema({
+                            name: String,
+                            email: String,
+                            age: Number
+                        });
+
+                    // Define an instance method
+                        userSchema.methods.getProfile = function() {
+                            return `${this.name} (${this.email}) is ${this.age} years old.`;
+                        };
+
+                    // Create a model
+                        const User = mongoose.model('User', userSchema);
+
+                    // Example usage
+                        async function example() {
+                        // Create a new user instance
+                            const user = new User({ name: 'Alice', email: 'alice@example.com', age: 30 });
+
+                        // Call the instance method
+                            console.log(user.getProfile()); // Output: Alice (alice@example.com) is 30 years old.
+                        }
+
+                    example();
+
+                CREATING AN INSTANCE METHOD THAT WILL TAKE CARE OF GENERATING TOKEN WHEN USER IS CREATED
+                    UserSchema.methods.createJWT = function () {
+                        return jwt.sign({userId: this._id, name: this.name}, 'secret', {expiresIn: '30d'})
+                    }
+
+    LOGIN FUNCTIONALITY 
+        Objectives:
+            - Validate - email, password - in controller
+            - If email or password is missing, throw BadRequestError
+            - Find User
+            - Compare Passwords
+            - If no user or password does not match, throw UnauthenticatedError
+            - If correct, generate Token
+            - Send Response with Token
+ 
+        EXAMPLE
+            const login = async ( req, res ) => {
+                const {email, password} = req.body
+
+                if(!email || !password) {
+                    throw new BadRequestError('Please provide email and password')
+                }
+                
+                const user = await User.findOne({email}) //looks up the first 
+
+                if(!user){
+                    throw new UnauthenticatedError('No user with the email provided is registered in the database')
+                }
+
+                const isPasswordCorrect = await user.comparePassword(password)
+                if(!isPasswordCorrect){
+                    throw new UnauthenticatedError(`Password for email ${email} is incorrect`)
+                }
+
+                const token = user.createJWT()
+                res.status(StatusCodes.OK).json({user: {name: user.name}, token}) //code for item found 200
+
+            }
+
+            module.exports = {
+                register, login 
+            }
+Tuesday
+    AUTH MIDDLEWARE SETUP 
+        Objectives:
+            - validate authorization presence and format 
+            - no token provided throw error
+            - get token from authHeader
+            - extract payload from token 
+            - insert payload into req
+            - send data to next middleware
+
+    JOBS MODEL 
+        RELATIONSHIPS BETWEEN DOCUMENTS IN DIFFERENT COLLECTIONS 
+            moongoose.Types.ObjectId
+                In Mongoose, Types.ObjectId is a special type used to represent MongoDB Object IDs.
+                Each document in a MongoDB collection has a unique identifier, which is usually an ObjectId. This ID is a 12-byte value, typically represented as a 24-character hexadecimal string.
+
+            REF SchemaType
+                ref: Establishes a relationship between collections.
+
+            EXAMPLE
+                // User schema
+                const userSchema = new mongoose.Schema({
+                    name: String,
+                    email: String,
+                });
+
+                // Post schema
+                const postSchema = new mongoose.Schema({
+                    title: String,
+                    content: String,
+                    author: {
+                        type: mongoose.Types.ObjectId,
+                        ref: 'User',  // Reference to the User model
+                    },
+                });
+
+Wednesday
+    GET ALL JOBS
+        USERID FILTER 
+            Usually whatever the user receives will be filtered by his id, otherwise he would receive absolutely everything.
+
+        EXAMPLE
+            await Job.find({createdBy: userId}).sort('createdBy')
+
+    SET TOKEN DYNAMICALLY IN POSTMAN
+        Allows to run a script to automatically access the token received and send that to the routes that need it.
+
+        AVOIDS
+            The need to constantly copying and pasting the token in each and every route.
+
+        ACCESS JSON DATA 
+            const jsonData = pm.response.json()
+        CREATE GLOBAL VARIABLE WITH THAT TOKEN
+            pm.globals.set("accessToken", jsonData.token);
+        AUTHORIZATION IN THE REST OF THE ROUTES
+            {{accessToken}}
+
+    GET SINGLE JOB 
+        NESTED DESTRUCTURING
+            const {user:{userId}, params:{id:jobId} } = req
+
+    UPDATE JOB
+        REMEMBER 
+            path just modifies what you send instead of replacing the entire thing
+
+        const job = await Job.findOneAndUpdate({_id: jobId, createdBy: userId}, req.body, {runValidators:true, new:true})
+
+        ADD ADDITIONAL VALIDATION FOR COMPANY AND POSITION
+            if(company === "" || position === ""){
+                throw new BadRequestError('Company or Position fields cannot be empty')
+            }
+
+Thursday        
+    ERRORS
+        Objective:
+            Make default mongoose errors more user friendly:
+                - duplicate error(emails?)
+                - custom errors
+                - validation errros
+                - cast errrors (id does not match exactly mongoose looking for)
+
+        DUPLICATE
+            Custom tailor through logic the errors already given by mongoose.
+
+            EXAMPLE 
+                let customError = {
+                    //set default 
+                    statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
+                    msg: err.message || 'Something went wrong try again later'
+                }
+
+                if(err.code && err.code == 11000){
+                    customError.msg = `Duplicate value entered for ${err.errorResponse.keyValue.email} field, please choose another value.`
+                    customError.statusCode = 400 //Bad Request
+                }
+        
+        CUSTOM ERROR
+            Tailor the customError object into something that will be used also by the custom error err object send to the error middleware.
+            Since the customError object already had these properties, it does not affect at all.
+
+            SYNTAX
+                return res.status(customError.statusCode).json({msg: customError.msg})
+
+        VALIDATION ERROR
+            Mongoose has new property that combines all validation errors in a single string.
+
+        CAST ERROR
+            Pretty much the same processs
+
+    SECURITY INFO AND PACKAGES
+        Deploying to cloud = Thinking about security.
+
+        SOLUTION
+            Installing packages in NPM 
+
+        HELMET
+            Setup numerous http headers to avoid attacks. 
+            
+        CORS
+            API Accessible from different domains.
+
+            NOT HAVING CORS
+                Won't be able to accesss files except on local. 
+
+        XSS - CLEAN 
+            Sanitizes the user input in:
+                req.body 
+                req.query
+                req.params
+
+            Allowing for protection against malicious code injection. 
+
+        EXPRESS-RATE-LIMIT
+            Limits number of requests at the same time. 
+
+    DEPLOYMENT PROCESS
+        PREP THE GITHUB REPO
+            1)move the project to its own folder to avoid any errors
+            2)delete the .git directory from a repository 
+                COMMAND
+                    RM - RF .GIT(MAC AND LINUX)
+                    rmdir /s /q .git(BASH)
+                        rmdir: This command is to remove directories
+                        /s: this option deletes the directory and all of its ocntents
+                        /q: this stands fro quiet mode, which deletes the directory without asking confiration.
+                    Remove-Item -Recurse -Force .git(POWERSHELL)
+                        Remove-Item: The cmdlet for removing files or directories in PowerShell.
+                        -Recurse: Deletes all items in the directory, including subdirectories and files.
+                        -Force: Forces the removal without asking for confirmation, even for hidden or read-only files.
+                        .git: The directory you want to remove.
+
+                WHAT HAPPENS WHEN RUNNING THIS COMMAND
+                    Complettely removes the .git directory from your project CAUSING a loss in version history and all git related configuration.
+                    Eseentially converts to standard directory.
+
+                WHY WOULD WE DO THIS 
+                    Creating a New Repository  
+                        If you want to make a fresh copy of the project for a different repository (without carrying over the original Git history), you can delete the .git directory and then initialize a new repository using git init
+
+        RENDER
+            1)connect github account to render
+            2)select repository 
+            3)start command: node app.js
+            4)fix script in package.json file 
+            5)import env variables 
+            6)dummy route for testing
+
+        POSTMAN
+            1)create a global variable for the production domain.
+            2)setup some route testing to confirm the deployment is working.
+            
+        POSTMAN DOCS
+            Postman offers docs for API but it goes to a separate URL, we can't specify where we want for it to go.
+
+            Export documentation from existing project collection.
+
+        APIMATIC
+            Helps devs automate the process of API docs.  
+
+            PROBLEM
+                Can't pass info directly to Swagger from Postman, it needs to be formatted by Apimatic.
+            
+            SDK Generation: 
+                APIMatic allows the automatic creation of SDKs for different programming languages such as Python, Java, JavaScript, Ruby, etc., based on API specifications.
+            API Documentation: 
+                It helps generate rich, interactive API documentation automatically from API specifications. This documentation is easy to share with developers and can be easily integrated into other platforms.
+            Code Samples: 
+                APIMatic also generates code samples that show developers how to make calls to the API in different languages.
+            API Specification Conversion: 
+                It supports converting API specifications between different formats like Swagger (OpenAPI), RAML, API Blueprint, Postman collections, etc.
+            Consistency and Updates: 
+                Automatically keeps SDKs, code samples, and documentation up to date as the API evolves.
+
+            USEFULNESS WITH SWAGGER
+                In essence, Swagger/OpenAPI defines the API structure, and APIMatic builds on top of it by providing essential developer tools like SDKs, documentation, and code snippets to make the API more accessible to developers.
+
+            STEPS TO USE
+                1)import postman collection
+                2)modify url
+                3)make sure authentication is bearer token 
+                4)change the endpoints from the group they are located in 
+                5)export file as yaml 3.0
+                6)paste in swagger editor
+                        
+        SWAGGER
+            1)delete group not needed
+            2)fix static url param to a dynamic one through the docs
+            3)create swagger.yaml file in root of the repo pasting what was in swagger editor
+
+            PACKAGES
+                "swagger-ui-express": "^5.0.1",
+                "yamljs": "^0.3.0"
+
+            //swagger 
+                const swaggerUI = require('swagger-ui-express') //imports the swagger ui 
+                const YAML = require('yamljs') //imports the parser 
+                const swaggerDocument= YAML.load('./swagger.yaml') //loads the yaml file
+
+            //dummy route
+                app.get('/', (req, res) => {
+                res.send('<h1>Jobs API</h1><a href="/api-docs">Dcoumentation<a/>')
+                })
+
+                app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument))
+
+SECTION 10: 07-JOBSTER-APP
+    ABOUT
+        Jobs api but taken to a much higher level 
+
+    
+Wednesday
+
+ 
+
+
+
 
             
 
-        SEND RESPONSE WITH TOKEN
             
+
+
+
+
+
+
+
+
+            
+            
+            
+
+        
+
+        
+
+
+            
+
+
+
+
+
+
+
+
+        
+
+        
+
+                
+
+
+            
+
+                
+
+                
+
         
                         
         
