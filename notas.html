@@ -2557,7 +2557,116 @@ Wednesday
             1)only used when working with a backend
             2)if front end, only our front end should interact with our backend
         
+    CLIENT
+        PUBLIC
+            Remember that static assets to serve will always go in the public folder.
+                1)css files
+                2)js files
+                3)photos
+
+    SETUP FRONT END
+        Client side router(create react app) in development
+            1)CRA offers a dev server which handles ALL ROUTING, no need to use own server.
+            2)CRA intercepts every URL change without ever needing to ask the server.
+
+            HOW IT WORKS
+                1)react route manages all routes
+                2)server provided by CRA serves the front end and refreshes the app
+                
+        Client side routing in production(built app)
+            1)Moving react app into production with npm run build, the static files are generated and packaged.
+            2)These files are then served by a server like EXPRESS, NGINX, or other static file host.
+            3)The server needs to know how to serve the index.html file for any route. 
+            4)server receives the request
+            5)client side routing needs the index.html to be served
+            6)catch all handler will serve the index.html and will let the client side routing handle the rest
+
+        NPM RUN BUILD 
+            Generatesd a React project with a standarized folder structure and pre configured settings.
+
+            STRUCTURE INCLUDES:
+                1)SRC: jsx files and other app logic
+                2)PUBLIC: static assets like images and html templates
+                3)node_modules: Contains all the dependencies installed for your project.
+                4)package.json: List all dependencies nd defines scripts to run and build
+
+
+    MODIFY USER MODEL 
+        Add lastname and location properties
+              lastName: {
+                type: String, 
+                trim: true,
+                require: [true, "Please provide last name"],
+                maxlength: 20,
+                default: 'lastname'
+            },
+            location: {
+                type:String,
+                trim: true,
+                default: 'my city'
+            }
     
+    MODIFY REGISTER AND LOGIN 
+        With the purpose of sending a more complete response.
+
+        const register = async (req, res) => {
+        const user = await User.create({ ...req.body })
+        const token = user.createJWT()
+        res.status(StatusCodes.CREATED).json({user: {
+            name: user.name,
+            lastName: user.lastName,
+            email:user.email,
+            location: user.location,
+            token
+        }})
+        }
+        
+    CREATE TEST USER
+        Register with the credentials of a test user to automate the demo.
+
+    UPDATE USER 
+        Create controller with logic
+
+        const updateUser = async(req, res) => {
+        //destructure request
+        const {email, name, lastName, location} = req.body
+        //validate all values where provided 
+        if(!email || !name || !lastName || !location) {
+            throw new BadRequestError('Please provide all values')
+        }
+        //update user
+        const user = await User.findByIdAndUpdate({_id: req.user.userId}, req.body, { new: true, runValidators: true })
+        //generate token 
+        const token = user.createJWT()
+        res.status(StatusCodes.OK).json({user: {
+            name: user.name,
+            lastName: user.lastName,
+            email:user.email,
+            location: user.location,
+            token
+        }})
+        }
+
+        We send new token when the change could change
+
+    USING SAVE WHEN UPDATING USER()
+        Triggers the pre and post save hooks 
+
+
+JOBSTER IS GOING TO BE LEFT UNFINISHED, WILL PROCEDE WITH OTHER MODULES 
+
+
+SECTION 11: HOW TO UPLOAD FILES TO A SERVER 
+
+OBJECTVIES / TO LEARN:
+    
+            
+        
+        
+
+    
+                    
+                    
 
  
 
