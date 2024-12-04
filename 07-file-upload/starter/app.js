@@ -7,13 +7,21 @@ const app = express();
 // database
 const connectDB = require('./db/connect');
 
+//custom routers
+const productRouter = require('./routes/productRoutes')
+
 // error handler
 const notFoundMiddleware = require('./middleware/not-found');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 
+//built in middleware 
+app.use(express.json())
+
 app.get('/', (req, res) => {
   res.send('<h1>File Upload Starter</h1>');
 });
+
+app.use('/api/v1/products', productRouter)
 
 // middleware
 app.use(notFoundMiddleware);
