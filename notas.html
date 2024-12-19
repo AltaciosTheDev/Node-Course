@@ -2655,11 +2655,229 @@ Wednesday
 
 JOBSTER IS GOING TO BE LEFT UNFINISHED, WILL PROCEDE WITH OTHER MODULES 
 
+QUICK GITHUB RECAP 
 
+WORKING DIRECTORY 
+    Directory available in the users computer file system where the changes in the files of the project are being made.
+
+    .GIT DIRECTORY 
+        After typing the command .git init, git behind the scenes, creates a special git database to store all info it needs to provide version control for the project.
+
+        STAGING AREA (selecting for future operation)
+            WHAT IS IT?        
+                Intermediary where files make a pit stop first. 
+
+            Git add will move the files to the staging area and will allow git to know which files have been changed and which changes have been made.
+
+        GIT REPOSITORY  
+            WHAT IS IT?
+                database itself, object database. 
+
+            Git commit will move from git staging area to git repository.
+            Contains the files and history of changes made to the files. 
+
+GIT FILE STATES
+    COMMITED
+        File is being tracked and safely stored in the repository.
+
+    MODIFIED
+        Changed since last time git took a photo of it. Different from version git has stored in repo.
+
+    STAGED(selecting for future operation)
+        Marked for inclution into next snapshot. 
+
+GIT COMMANDS
+    GIT CLONE
+        From remote repository to local git repository
+
+    GIT PULL 
+        GIT FETCH
+            From remote git repo to local git repo
+        GIT MERGE
+            Merge from local git repo to working directory
+
+    GIT ADD 
+        From working directory to staging area
+
+    GIT COMMIT 
+        From staging area to local repository 
+    
+    GIT PUSH 
+        From local repository to remote repository
+
+    GIT CHECKOUT / GIT SWITCH
+        Switch from branches 
+
+    
 SECTION 11: HOW TO UPLOAD FILES TO A SERVER 
 
-OBJECTVIES / TO LEARN:
+OBJECTIVES:
+    Learn how to upload files to a server
+    Reference to use before big project
+    Learn to upload images using postman
+
+TOOLS TO USE
+    Express file upload library 
+    Cloudinary service option (store images on the cloud)
+
+EXAMPLE OF USE
+    Admin of ecommerce store with form to add product. 
+    Before adding product to database, image needs to be uploaded to server to make use of that path.
+
+TUESDAY 12/4
+    Setup
+    Created product model
+    Worked product controller
+    Worked uploadsController
+    Created productRouter
+    Included on the app.js
+
+WEDNESDAY 12/5 
+---
+CREATING A PRODUCT
+    To create a product, image property will need a string that is a path to an uploaded image on the cloud.
+
+    UPLOADING IMAGE TO CLOUD
+        Another table in the db will hold the image name and path and that path will be given to the image property in the products table. 
+
+    FLEXIBLE IMAGE MANAGEMENT
+        Allows for one - many relationships if a product has multiple images.
+
+    REUSABILITY
+        If an image is relevant to more than one product, storing it in the images table avoids duplicating the same path for multiple products.
+
+EXPRESS-FILEUPLOAD LIBRARY 
+    PROBLEM
+        When uploading a file through postman, express can't parse or understand it.
+
+    WHAT IS IT?
+        An easy to use middleware for processing file uploads in Express.js
+        Parses incoming file data from multipart/form-data requests and makes uploaded files accessible through the req.files object
+
+    WHY USE
+        Ease of use
+            Simplifes the upload by abstrascting complex parsing and file operations
+        Flexibility
+            Allows uploading files of various sizes
+        Integration
+            Works seemlessly
     
+    HOW DOES IT WORK?
+        Setup
+            Intercepts and parses incoming multiport/form-data requests
+        File Handling
+            Uploaded files are attached to the req.files object
+        File Operations
+            Provides methods like .mv() to move or save the uploaded file to a specific directory 
+
+    STEPS TO USE
+        1)install
+            npm i express-fileupload
+        2)import
+            const fileUpload = require('express-fileupload');
+
+        3)use
+            app.use(fileUpload());
+            app.use(fileUpload({
+                limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+                abortOnLimit: true,                    // Reject files that exceed limit
+                useTempFiles: true,                    // Use temporary files for uploads
+                tempFileDir: '/tmp/'                   // Temp directory for storage
+            }));
+        
+        4)handle file uploads in routes
+
+MONDAY 09/12/24
+GET ALL PRODUCTS CONTROLLER 
+    Basic get controller to fetch all products from the db
+
+WHY DONT WE NEED TO PROVIDE A FULL PATH?
+    The front end is already pointing all the time to the server. So if we have the resources in the public folder, it will automatically look for the resources in that public folder.
+
+HOW EXPRESS SERVES STATIC FILES 
+    When we define a folder as "public" in an express app, using express.static, the files within the folder are automatically made accesible via HTTP. The express.static middleware serves these files relative to the specified directory. 
+
+    WHAT HAPPENS INTERNALLY
+        1)express maps that directory to the root path (/) of your app by default.
+        2)Any file within the public folder can then be accessed directly by its relative path. 
+        3)when using a url like "/uploads/burger.jpg", the browser automatically assumes that it's relative to your applications base URL.
+
+ADDITIONAL CHECKS TO CHECK FOR:
+    1)check if the image exists
+    2)file sending is an image
+    3)size is not bigger than specified 
+
+CLOUDINARY 
+    Cloud based service that provides tools for managing, storing, and optimizing media assets like images, videos, and other static files. 
+
+    KEY FEATURES
+        media storage
+            stores your images, videos, and other files.
+        image transformation
+            on the fly transformations like resizing, cropping, and adding overlays to images via URL parameters.
+        video processing
+            supports video transformations like trimming or converting.
+        cdn delivery
+            delivers assets quickly through a content delivery network
+
+CONNECTING TO MY CLOUDINARY 
+    Setup 3 variables in the .env:
+        CLOUD_NAME
+        CLOUD_API_KEY
+        CLOUD_API_SECRET
+
+MONDAY 12/16/24 
+    Finished section 07 file upload
+
+TUESDAY 12/17/24
+Start Section 08(11) Send Emails 
+
+OBJECTIVE 
+    1)Learn basics of email sending to build big API 
+    2)Create route that will auto send an email to recipient 
+
+NODEMAILER
+    Nodejs library for sending emails programatically. 
+
+    WHY?
+        1)provides an easy way to set up and send emails from your app.
+        2)supports plain text, html emails, file attachments.
+        3)works with services like gmail, outlook, smtp servers.
+
+    HOW?
+        Requires a transport config to send emails. The transport defines how the emails is sent. (Typically through SMTP).
+        1)install library
+        2)configure a transport
+        3)create and send email messages with transport
+
+    CREATING TRANSPORT 
+        Basically connecting to the service that does the sending.
+
+    TRANSPORT SERVICE
+        Ethereal 
+        Mailtrap 
+        Gmail 
+
+    GOING FROM DEV TO PROD 
+        Just swap credentials 
+
+WEDNESDAY 12/18/24
+Start section 09(12)-stripe
+
+
+        
+
+
+
+
+
+
+    
+
+
+    
+
+
             
         
         

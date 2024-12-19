@@ -28,7 +28,7 @@ app.use(express.json())
 app.use(fileUpload({useTempFiles:true}))
 
 app.get('/', (req, res) => {
-  res.send('<h1>File Upload Starter</h1>');
+  res.send('<h1>File Upload Starter</h1> <a href="/send">send email</a>');
 });
 
 app.use('/api/v1/products', productRouter)
